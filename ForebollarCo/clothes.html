@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="sv">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Om Oss - Forebollar</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="script.js"></script>
+    <style>
+        footer {
+            background-color: #222;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        footer a {
+            color: white;
+            text-decoration: none;
+            margin: 0 10px;
+        }
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+                flex-direction: column;
+                width: 100%;
+                text-align: center;
+                background-color: #fff;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                padding: 20px;
+            }
+            .nav-links.active {
+                display: flex;
+            }
+            .menu-toggle {
+                display: flex;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="palette-header">
+        <span id="rotating-text">100% återvunna golfbollar!</span>
+    </div>
+    <nav class="navbar">
+        <div class="logo">
+            <a href="index.html">
+                <img src="logo.png">
+            </a>
+         </div>
+        <div class="menu-toggle" onclick="toggleMenu()">
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+        <ul class="nav-links">
+            <li><a href="golfbollar.html">Golfbollar</a></li>
+            <li><a href="clothes.html">Kläder</a></li>
+            <li><a href="about.html">Info</a></li>
+            <li><a href="contact.html">Kontakt</a></li>
+            <li><a href="index.html#varukorg">Varukorg</a></li>
+        </ul>
+    </nav>
+    <section class="hero">
+        <div class="hero-content">
+            <h1>KLÄDER</h1>
+            <p>Kommer Snart!</p>
+        </div>
+    </section>
+    <footer>
+        <a href="mailto:forebollar@gmail.com">Kontakta oss</a>
+        <p>FOREBOLLAR</p>
+    </footer>
+</body>
+</html>
