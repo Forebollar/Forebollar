@@ -1,0 +1,861 @@
+<!DOCTYPE html>
+ <html lang="sv">
+ <head>
+     <meta charset="UTF-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <title>Hem - Forebollar</title>
+     <link rel="stylesheet" href="style.css">
+     <script src="script.js"></script>
+     <style>
+         .slider-container {
+             overflow: hidden;
+             width: 90%;
+             margin: 40px auto;
+             position: relative;
+         }
+         .slider-container h1 {
+             font-size: xx-large;
+             text-align: center;
+         }
+         .product-slider {
+             display: flex;
+             transition: transform 0.5s ease-in-out;
+         }
+         .product {
+             background: white;
+             color: black;
+             min-width: 250px;
+             margin: 10px;
+             padding: 20px;
+             border-radius: 10px;
+             text-align: center;
+             box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+             position: relative;
+         }
+         .product img {
+             width: 100%;
+             border-radius: 10px;
+         }
+         .product select {
+             border: solid #222 2px;
+             border-radius: none;
+         }
+         .compare-price {
+             font-size: 14px;
+             color: #74e779;
+             text-decoration: line-through;
+             margin-top: 10px;
+             position: absolute;
+             right: 20px;
+             top: 30px;
+         }
+         .add-to-cart {
+             background-color: transparent;
+             color: #222;
+             border: 2px solid #111;
+             padding: 10px 15px;
+             margin-top: 10px;
+             cursor: pointer;
+         }
+         .arrows {
+             position: absolute;
+             top: 50%;
+             width: 100%;
+             display: flex;
+             justify-content: space-between;
+             transform: translateY(-50%);
+         }
+         .arrow {
+             background-color: rgba(0, 0, 0, 0.5);
+             color: white;
+             font-size: 24px;
+             padding: 10px;
+             cursor: pointer;
+             transition: background-color 0.3s;
+         }
+         .arrow:hover {
+             background-color: rgba(0, 0, 0, 0.8);
+         }
+         @media (max-width: 768px) {
+             .nav-links {
+                 display: none;
+                 flex-direction: column;
+                 width: 100%;
+                 text-align: center;
+                 background-color: #fff;
+                 position: absolute;
+                 top: 100%;
+                 left: 0;
+                 padding: 20px;
+             }
+             .nav-links li {
+                 margin: 10px 0;
+             }
+             .menu-toggle {
+                 display: flex;
+             }
+             .nav-links.active {
+                 display: flex;
+             }
+         }
+         @media (max-width: 768px) {
+             .slider-container {
+                 width: 100%;
+                 margin: 20px auto;
+             }
+             .product-slider {
+                 display: flex;
+                 flex-wrap: nowrap;
+                 transition: transform 0.5s ease-in-out;
+             }
+             .product {
+                 min-width: 200px;
+                 margin: 10px;
+                 padding: 10px;
+             }
+             .arrow {
+                 font-size: 18px;
+             }
+         }
+         @media (max-width: 480px) {
+             .product {
+                 min-width: 150px;
+                 padding: 8px;
+             }
+             .product-slider {
+                 flex-direction: column;
+             }
+             .arrow {
+                 display: none;
+             }
+             .stock-label {
+                 padding: 3px 6px;
+                 font-size: 10px;
+             }
+         }
+ 
+         /* Cart Section */
+         .cart-section {
+             margin-top: 40px;
+             padding: 20px;
+             background-color: #f9f9f9;
+             border-top: 2px solid #ddd;
+             border-radius: 8px;
+             max-width: 800px;
+             margin-left: auto;
+             margin-right: auto;
+         }
+         .cart-section h2 {
+             font-size: 28px;
+             margin-bottom: 20px;
+             text-align: center;
+             color: #333;
+         }
+         .cart-section button {
+             background-color: transparent;
+             color: #222;
+             border: 2px solid #111;
+             padding: 10px 15px;
+             margin-top: 10px;
+             cursor: pointer;
+             text-align: center;
+         }
+         .cart-item {
+             display: flex;
+             justify-content: space-between;
+             padding: 15px;
+             background-color: white;
+             margin-bottom: 10px;
+             border-radius: 8px;
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+             align-items: center;
+         }
+         .cart-item p {
+             margin: 0;
+             font-size: 16px;
+         }
+         .cart-item .product-name {
+             font-weight: bold;
+             color: #333;
+         }
+         .cart-item .price {
+             font-size: 18px;
+             color: #28a745;
+         }
+         .cart-item .remove-item {
+             color: #e74c3c;
+             font-size: 14px;
+             cursor: pointer;
+             text-decoration: underline;
+         }
+         .cart-item .remove-item:hover {
+             color: #c0392b;
+         }
+         .cart-footer {
+             text-align: right;
+             padding: 20px 0;
+             border-top: 2px solid #ddd;
+             font-size: 18px;
+             font-weight: bold;
+             color: #333;
+         }
+         .empty-cart {
+             text-align: center;
+             font-size: 18px;
+             color: #888;
+         }
+         .stock-label {
+             position: absolute;
+             top: 10px;
+             left: 10px;
+             color: white;
+             padding: 5px 10px;
+             font-size: 14px;
+             font-weight: bold;
+             border-radius: 0px 0px 5px 0px;
+         }
+         .product {
+             position: relative;
+         }
+
+         .product {
+                position: relative;
+                padding: 10px;
+                border: none;
+                border-radius: 0px;
+                text-align: center;
+                background: none;
+                display: inline-block;
+                box-shadow: none;
+                width: 200px;
+                margin: 10px;
+            }
+            
+            .product img {
+                border-radius: 0px;
+                border: none;
+            }
+
+            .info-overlay {
+                display: none;
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.7);
+                color: white;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
+                padding: 10px;
+                border-radius: 5px;
+                box-sizing: border-box; /* Ensure padding doesn't push it out of bounds */
+            }
+
+            .info-overlay p {
+                margin: 0 0 10px;
+            }
+
+            .info-overlay button {
+                background: white;
+                color: black;
+                border: none;
+                padding: 5px 10px;
+                cursor: pointer;
+            }
+
+            .product {
+                position: relative; /* Gör att vi kan positionera element inne i produktkortet */
+            }
+
+            .product select {
+                margin-bottom: 20px;
+            }
+
+            .product img {
+                display: block;
+                width: 100%;
+                border-radius: 0;
+            }
+
+            .add-to-cart {
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+                background: none;   /* så att den syns tydligt ovanpå bilden */
+                border: none;
+                padding: 5px;
+                cursor: pointer;
+                z-index: 2; /* så den hamnar över bilden */
+            }
+
+            .add-to-cart img {
+                height: 25px;
+                width: auto;
+            }
+
+            .info-btn {
+                position: absolute;
+                bottom: 10px;
+                left: 10px;
+                background: none;   /* synlig ovanpå bilden */
+                border: none;
+                padding: 5px;
+                cursor: pointer;
+                z-index: 2;
+                font-size: 16px;
+            }
+
+
+        .info-overlay button {
+            background: none;
+            color: #fff;
+            border: 1px solid #fff;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        @media (max-width: 768px) {
+            #slider {
+                display: flex;
+                flex-wrap: wrap;
+                justify-content: center; 
+                align-items: center;   
+            }
+
+            .product {
+                width: 90%;
+                margin: 10px 0px;
+            }
+            .product select,
+            .add-to-cart {
+                display: block;
+                width: 80%;  /* Gör knapparna och select-fältet lika breda som produktkortet */
+                margin: 10px 0;  /* Lägger till lite vertikalt avstånd mellan knapparna */
+            }
+            .info-btn {
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+
+        /* Små skärmar */
+            @media (max-width: 768px) {
+                .product {
+                    width: 90%;
+                    margin: 15px auto;
+                }
+
+                /* Gör om knapparna så de hamnar under bilden */
+                .add-to-cart,
+                .info-btn {
+                    position: static;       /* tar bort absoluta placeringen */
+                    display: inline-block;
+                    margin: 5px;           /* lite luft mellan knapparna */
+                }
+
+                .product select {
+                    display: block;
+                    width: 100%;
+                    margin-top: 10px;
+                }
+
+                /* Centrera knapparna snyggt */
+                .product-buttons {
+                    display: flex;
+                    justify-content: space-between;
+                    margin-top: 10px;
+                }
+            }
+
+
+        @media (max-width: 480px) {
+            .product {
+                width: 70%; 
+                margin: 10px 0px;
+            }
+            .product select,
+            .add-to-cart {
+                display: block;
+                width: 100%;  /* Gör knapparna och select-fältet lika breda som produktkortet */
+                margin: 10px 0;  /* Lägger till lite vertikalt avstånd mellan knapparna */
+            }
+            .info-btn {
+                position: absolute;
+                bottom: 10px;
+                right: 10px;
+            }
+        }
+
+        .sale-badge {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: red;
+            color: white;
+            padding: 5px 8px;
+            font-size: 12px;
+            font-weight: bold;
+            border-radius: 0px 0px 0px 5px;
+            z-index: 2;
+        }
+
+        .product-price {
+            margin-bottom: 5px;
+        }
+
+
+
+
+ 
+     </style>
+ </head>
+ <body>
+    <div class="palette-header">
+        <span id="rotating-text">100% återvunna golfbollar!</span>
+      </div>      
+     <nav class="navbar">
+         <div class="logo">
+            <img src="logo.png">
+         </div>
+         <div class="menu-toggle" onclick="toggleMenu()">
+             <div></div>
+             <div></div>
+             <div></div>
+         </div>
+         <ul class="nav-links">
+             <li><a href="golfbollar.html">Golfbollar</a></li>
+             <li><a href="clothes.html">Kläder</a></li>
+             <li><a href="about.html">Info</a></li>
+             <li><a href="contact.html">Kontakt</a></li>
+             <li><a href="#varukorg">Varukorg</a></li>
+         </ul>
+     </nav>
+ 
+     <section class="hero">
+        <div class="hero-content">
+            <h1>FOREBOLLAR</h1>
+            <p></p>
+        </div>
+    </section>    
+    
+     <section id="featured-product-section"></section>
+     <script src="featured-product.js"></script>
+ 
+     <section class="slider-container">
+         <h1>Vårt sortiment</h1>
+         <div class="product-slider" id="slider"></div>
+         <div class="arrows">
+             <span class="arrow" id="prev">&#8592;</span>
+             <span class="arrow" id="next">&#8594;</span>
+         </div>
+     </section>
+ 
+     <section class="cart-section" id="varukorg">
+         <h2>Din Varukorg</h2>
+         <div id="cart-items">
+             <!-- Dynamically filled by JavaScript -->
+         </div>
+         <div class="cart-footer" id="cart-footer">
+             <!-- Total price will appear here -->
+         </div>
+         <center>
+             <button onclick="sendOrder()" style="display: block;">
+                 Skicka Beställning
+             </button>  
+         </center>      
+     </section>
+ 
+     <footer style="background-color: #222; color: white; padding: 20px; text-align: center;">
+         <div>
+             <a href="mailto:forebollar@gmail.com" style="color: white; text-decoration: none; margin: 0 10px;">Kontakta oss</a>
+         </div>
+         <p>FOREBOLLAR</p>
+     </footer>    
+ 
+     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+     <script>
+         emailjs.init("M8hlcCoiJItfe70PT"); // Ersätt med din EmailJS Public Key
+ 
+         function saveCart() {
+             localStorage.setItem("cart", JSON.stringify(cart));
+         }
+ 
+         function loadCart() {
+             return JSON.parse(localStorage.getItem("cart")) || [];
+         }
+
+         const sales = [
+            {
+                productName: "*",
+                discountPercent: 0,
+                startDate: "2020-09-23",
+                endDate: "2020-06-30",
+                quality: "both"
+            },
+
+
+        ];
+
+
+ 
+         const products = [
+                { name: "Titleist Pro V1/V1x - 12st", price: 190, comparePrice: 399, image: "Golfbollar/Pro-V1.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "Pro V1 är golfbollen som presterar maximalt i alla delar av spelet med ökad längd, låg spinn från tee och penetrerande bollflykt." },
+                { name: "Blandade Märken - 25st", price: 200, comparePrice: 399, image: "Golfbollar/blandade-bollar.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "En lagom mix mellan olika golfbolls märken för dig som letar efter lite högre kvalitet än floridabollar fast till ett bra pris. Omslags bilden för denna mix ger en bra indikation på vad du kan förvänta dig." },
+                { name: "PGA Tour Mix - 25st", price: 360, comparePrice: 700, image: "Golfbollar/pga.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "En perfekt mix av golfbollar som syns på pga touren, detta är en mix för dig som vill ha högsta möjliga prestanda på dina golfbollar. I denna mix inngår: ProV1/V1x, Tp5/Tp5x/Tp5Pix, Chorme Soft/Tour, Bridgestone Tour BXs, Srixon Z-Star." },
+                { name: "Tour Mix - 12st", price: 150, comparePrice: 325, image: "Golfbollar/tour-mix.jpg", stockStatusFirsthand: "Få i lager", stockStatusSecondhand: "Finns i lager", description: "En mix full av prisvärda tourbollar, I mixen kan följande bollar förekomma: Titleist Tour Soft/Speed, Callaway Chrome Soft/Tour, Bridgestone Tour B XS, Srixon Z-Star, Vice Pro, m.m." },
+                { name: "Callaway Chrome Soft - 12st", price: 175, comparePrice: 349, image: "Golfbollar/chromesoft.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "Det är en mjuk och förlåtande tourboll som ger otrolig känsla och fantastisk spinnkontroll i de kortare slagen. Golfbollens hyperelastika SoftFast-kärna bidrar dessutom till låg spinn i utslagen samt exceptionell distans. " },
+                { name: "Taylormade TP5 Mix - 12st", price: 190, comparePrice: 399, image: "Golfbollar/taylormade-tp5.jpg", stockStatusFirsthand: "Slutsåld", stockStatusSecondhand: "Slutsåld", description: "TP5, En 5-delad golfboll designad för att fungera för alla golfare som vill spela på en tourboll av högsta prestanda." },
+                { name: "Taylormade Mix - 12st", price: 125, comparePrice: 279, image: "Golfbollar/taylormade.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "En mycket populär och prisvärd mix av bollar från Taylormade." },
+                { name: "Florida Mix - 25st", price: 150, comparePrice: 279, image: "Golfbollar/florida-mix.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "En perfekt mix av golfbollar för dig som vill köpa prisvärda bollar utan att det spelar så stor roll exakt vilka modeller det är." },
+                { name: "Callaway Mix - 12st", price: 120, comparePrice: 250, image: "Golfbollar/callaway.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "Callaway Mix innehåller en blandning av olika modeller och generationer golfbollar från Callaway som passar alla spelstilar." },
+                { name: "Titleist Mix - 12st", price: 130, comparePrice: 299, image: "Golfbollar/titleist-mix.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "Titleist Mix innehåller en mix av olika modeller och generationer golfbollar som passar alla spelstilar." },
+                { name: "Färg Mix - 12st", price: 110, comparePrice: 350, image: "Golfbollar/färg-mix.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "Färgglada bollar från alla märken, för bättre synlighet på banan." },
+                { name: "Wilson Mix - 12st", price: 100, comparePrice: 160, image: "Golfbollar/wilson-mix.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "En mix av Wilson golfbollar – bra kvalitet till ett fantastiskt pris, perfekt för spelare som vill ha pålitliga bollar utan att spräcka budgeten! " },
+                { name: "Srixon Mix - 12st", price: 110, comparePrice: 190, image: "Golfbollar/srixon.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: " Här kan du köpa en prisvärd mix av Srixons golfbollar, perfekt för medel och höghandicapare. Mixen innehåller populära modeller som Q-Star, Distance, Hi-Spin och AD333, m.m." },
+            ];
+
+            let cart = loadCart();
+            const slider = document.getElementById("slider");
+
+            const stockColors = {
+                "Finns i lager": "green",
+                "Få i lager": "orange",
+                "Slutsåld": "red"
+            };
+
+            function getCurrentPrice(product, selectedQuality) {
+                const today = new Date();
+
+                // 1. Försök hitta en specifik rea först
+                let activeSale = sales.find(sale =>
+                    sale.productName === product.name &&
+                    (sale.quality === selectedQuality || sale.quality === "both") &&
+                    new Date(sale.startDate) <= today &&
+                    new Date(sale.endDate) >= today
+                );
+
+                // 2. Om ingen specifik, leta efter en generell ("*")
+                if (!activeSale) {
+                    activeSale = sales.find(sale =>
+                        sale.productName === "*" &&
+                        (sale.quality === selectedQuality || sale.quality === "both") &&
+                        new Date(sale.startDate) <= today &&
+                        new Date(sale.endDate) >= today
+                    );
+                }
+
+                // 3. Grundpris
+                let basePrice = product.price;
+
+                // 4. Om förstahand, multiplicera med 1.5
+                if (selectedQuality === "firsthand") {
+                    basePrice *= 1.5;
+                }
+
+                // 5. Tillämpa rea om aktiv
+                if (activeSale) {
+                    if (activeSale.salePrice !== undefined) {
+                        return activeSale.salePrice;
+                    } else if (activeSale.discountPercent !== undefined) {
+                        return basePrice * (1 - activeSale.discountPercent / 100);
+                    }
+                }
+
+                return basePrice;
+            }
+
+
+
+            function isOnSale(product, selectedQuality) {
+                const today = new Date();
+                return sales.some(sale =>
+                    sale.productName === product.name &&
+                    (sale.quality === selectedQuality || sale.quality === "both") &&
+                    new Date(sale.startDate) <= today &&
+                    new Date(sale.endDate) >= today
+                );
+            }
+
+
+
+
+            products.forEach((product, index) => {
+                    const selectedQuality = "secondhand"; // defaultvisning
+
+                    let div = document.createElement("div");
+                    div.classList.add("product");
+
+                    const stockStatus = product.stockStatusSecondhand;
+
+                    let stockLabel = document.createElement("div");
+                    stockLabel.classList.add("stock-label");
+                    stockLabel.style.backgroundColor = stockColors[stockStatus];
+                    stockLabel.innerText = stockStatus;
+
+                    const currentPrice = getCurrentPrice(product, selectedQuality);
+                    const basePrice = selectedQuality === "firsthand" ? product.price * 1.5 : product.price;
+                    const onSale = currentPrice < basePrice;
+
+                    let saleBadge = "";
+                        if (onSale) {
+                            const activeSale = sales.find(sale =>
+                                (sale.productName === product.name || sale.productName === "*") &&
+                                (sale.quality === selectedQuality || sale.quality === "both") &&
+                                new Date(sale.startDate) <= new Date() &&
+                                new Date(sale.endDate) >= new Date()
+                            );
+
+                            if (activeSale && activeSale.discountPercent) {
+                                saleBadge = `<div class="sale-badge">REA - ${activeSale.discountPercent}%</div>`;
+                            } else {
+                                saleBadge = `<div class="sale-badge">REA</div>`;
+                            }
+                        }
+
+                    div.innerHTML = `
+                        ${saleBadge}
+                        <img src="${product.image}" alt="${product.name}">
+                        <h3>${product.name}</h3>
+                        ${onSale ? `
+                            <p style="color: red; font-weight: bold; margin: 5px 0;">REA:</p>
+                            <p class="product-price" id="price-${index}">
+                                <span style="color: red;">${currentPrice.toFixed(2)} kr</span>
+                                <span style="text-decoration: line-through; color: #888; font-size: 14px; margin-left: 6px;">
+                                    ${basePrice.toFixed(2)} kr
+                                </span>
+                            </p>
+                        ` : `
+                            <p class="product-price" id="price-${index}">${basePrice.toFixed(2)} kr</p>
+                        `}
+                        <p class="compare-price">${product.comparePrice} kr</p>
+                        <select id="quality-${index}" onchange="updateStock(${index})">
+                            <option value="secondhand">2:a Klass</option>
+                            <option value="firsthand">1:a Klass</option>
+                        </select>
+                        <div class="product-buttons">
+                            <button class="info-btn" onclick="showInfo(${index})">ℹ️</button>
+                            <button class="add-to-cart" id="cart-btn-${index}" onclick="addToCart(${index})">
+                                <img src="add-to-cart.png">
+                            </button>
+                        </div>
+                        <div class="info-overlay" id="info-${index}" style="display: none;">
+                            <p>${product.description}</p>
+                            <button onclick="hideInfo(${index})">Stäng</button>
+                        </div>
+                    `;
+
+
+                    div.prepend(stockLabel);
+                    slider.appendChild(div);
+                });
+
+
+                function showInfo(index) {
+                    document.getElementById(`info-${index}`).style.display = "flex";
+                }
+
+                function hideInfo(index) {
+                    document.getElementById(`info-${index}`).style.display = "none";
+                }
+
+            function showInfo(index) {
+                document.getElementById(`info-${index}`).style.display = "flex";
+            }
+
+            function hideInfo(index) {
+                document.getElementById(`info-${index}`).style.display = "none";
+            }
+
+
+
+
+
+            // Uppdatera lagerstatus baserat på kvalitet
+            function updateStock(index) {
+                const select = document.getElementById(`quality-${index}`);
+                const selectedQuality = select.value;
+                const product = products[index];
+                let stockStatus = selectedQuality === "firsthand" ? product.stockStatusFirsthand : product.stockStatusSecondhand;
+
+                let stockLabel = slider.children[index].querySelector(".stock-label");
+                stockLabel.innerText = stockStatus;
+                stockLabel.style.backgroundColor = stockColors[stockStatus];
+
+                let cartBtn = document.getElementById(`cart-btn-${index}`);
+                cartBtn.disabled = stockStatus === "Slutsåld";
+
+                updatePrice(index); // Lägg till detta för att uppdatera priset
+            }
+
+ 
+            function updatePrice(index) {
+                const qualitySelect = document.getElementById(`quality-${index}`);
+                const selectedQuality = qualitySelect.value;
+                const product = products[index];
+                const priceElement = document.getElementById(`price-${index}`);
+
+                const currentPrice = getCurrentPrice(product, selectedQuality);
+                const basePrice = selectedQuality === "firsthand" ? product.price * 1.5 : product.price;
+
+                // Kolla om det är rabatt (jämför currentPrice med basePrice)
+                const isSale = currentPrice < basePrice;
+
+                if (isSale) {
+                    priceElement.innerHTML = `
+                        <span style="color: red;">${currentPrice.toFixed(2)} kr</span>
+                        <span style="text-decoration: line-through; color: #888; font-size: 14px; margin-left: 6px;">
+                            ${basePrice.toFixed(2)} kr
+                        </span>
+                    `;
+                } else {
+                    priceElement.textContent = `${basePrice.toFixed(2)} kr`;
+                }
+            }
+
+
+
+ 
+            function addToCart(index) {
+                const qualitySelect = document.getElementById(`quality-${index}`);
+                const selectedQuality = qualitySelect.value;
+                const product = products[index];
+
+                if (selectedQuality === "firsthand" && product.stockStatusFirsthand === "Slutsåld") {
+                    alert("Denna produkt är slutsåld!");
+                    return;
+                }
+                if (selectedQuality === "secondhand" && product.stockStatusSecondhand === "Slutsåld") {
+                    alert("Denna produkt är slutsåld!");
+                    return;
+                }
+
+                let finalPrice = getCurrentPrice(product, selectedQuality);
+
+                const productWithPrice = { 
+                    ...product, 
+                    price: finalPrice.toFixed(2), 
+                    quality: selectedQuality === "firsthand" ? "1:a sortering" : "2:a sortering"
+                };
+
+                cart.push(productWithPrice);
+                saveCart();
+                updateCartDisplay();
+                alert(`${product.name} (${productWithPrice.quality}) har lagts till i varukorgen!`);
+            }
+
+
+ 
+         function removeFromCart(index) {
+             cart.splice(index, 1);
+             saveCart();
+             updateCartDisplay();
+         }
+ 
+         function updateCartDisplay() {
+                const cartItemsContainer = document.getElementById("cart-items");
+                cartItemsContainer.innerHTML = "";
+                if (cart.length === 0) {
+                    cartItemsContainer.innerHTML = "<p class='empty-cart'>Din varukorg är tom.</p>";
+                    document.getElementById("cart-footer").innerHTML = "";
+                } else {
+                    let totalPrice = 0;
+                    cart.forEach((item, index) => {
+                        const cartItemDiv = document.createElement("div");
+                        cartItemDiv.classList.add("cart-item");
+                        cartItemDiv.innerHTML = `
+                            <p class="product-name">${item.name} (${item.quality}, ${item.lining}) - ${item.price} kr</p>
+                            <p><span class="remove-item" onclick="removeFromCart(${index})">Ta bort</span></p>
+                        `;
+                        cartItemsContainer.appendChild(cartItemDiv);
+                        totalPrice += parseFloat(item.price);
+                    });
+                    document.getElementById("cart-footer").innerHTML = `Total: ${totalPrice.toFixed(2)} kr`;
+                }
+            }
+
+ 
+         function sendOrder() {
+                let customerEmail = prompt("Ange din Mail (Gmail, Hotmail, icloud):");
+
+                if (!customerEmail || !customerEmail.match(/(@gmail\.com|@hotmail\.com|@icloud\.com)$/)) {
+                    alert("Du måste ange en giltig e-postadress från Gmail, Hotmail eller iCloud!");
+                    return; // Stoppar funktionen om e-postadressen är ogiltig
+                }
+
+                if (cart.length === 0) {
+                    alert("Varukorgen är tom!");
+                    return;
+                }
+
+                let orderDetails = cart.map(item => `- ${item.name} (${item.price} kr)`).join("\n");
+
+                let emailParams = {
+                    customer_email: customerEmail,
+                    order: orderDetails
+                };
+
+                emailjs.send("service_hopnllq", "template_9k0lu8p", emailParams)
+                    .then(() => {
+                        alert("Beställning skickad!");
+                        cart = [];
+                        saveCart();
+                        updateCartDisplay();
+                    })
+                    .catch(err => alert("Fel vid skickning: " + err));
+            }
+
+                let currentIndex = 0;
+                const sliderTrack = document.querySelector(".product-slider");
+                const prevBtn = document.getElementById("prev");
+                const nextBtn = document.getElementById("next");
+
+                function updateSlider() {
+                    const productWidth = document.querySelector(".product").offsetWidth + 200;
+                    sliderTrack.style.transform = `translateX(${-currentIndex * productWidth}px)`;
+                }
+
+                prevBtn.addEventListener("click", () => {
+                    if (currentIndex > 0) {
+                        currentIndex--;
+                        updateSlider();
+                    }
+                });
+
+                nextBtn.addEventListener("click", () => {
+                    if (currentIndex < products.length - 3) {
+                        currentIndex++;
+                        updateSlider();
+                    }
+                });
+
+                window.addEventListener("resize", updateSlider);
+                updateCartDisplay();
+ 
+         prevButton.onclick = () => {
+             if (currentIndex > 0) {
+                 currentIndex--;
+                 updateSlider();
+             }
+         };
+ 
+         nextButton.onclick = () => {
+             if (currentIndex < products.length - 1) {
+                 currentIndex++;
+                 updateSlider();
+             }
+         };
+ 
+         function toggleMenu() {
+             const menu = document.querySelector('.nav-links');
+             menu.classList.toggle('active');
+         }
+ 
+         updateCartDisplay();
+ 
+     </script> 
+ 
+ </body>
