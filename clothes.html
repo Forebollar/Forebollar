@@ -1,77 +1,446 @@
 <!DOCTYPE html>
 <html lang="sv">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Om Oss - Forebollar</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="icon" type="image/png" sizes="128x128" href="logowebb.png">
-    <script src="script.js"></script>
-    <style>
-        footer {
-            background-color: #222;
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Kläder - Forebollar</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="icon" type="image/png" sizes="128x128" href="logowebb.png">
+  <script src="script.js"></script>
+  <style>
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 30px;
+      padding: 40px;
+      max-width: 1200px;
+      margin: auto;
+    }
+    .product {
+      position: relative;
+      background: white;
+      padding: 15px;
+      text-align: left;
+      border: 1px solid #ddd;
+    }
+    .product img {
+      width: 100%;
+      border-radius: 0;
+    }
+    .product h3 {
+      margin: 10px 0px;
+    }
+    .product p {
+      margin: 0;
+      color: #444;
+    }
+    .cart-btn {
+      background: #0b0b43;
+      border: none;
+      color: white;
+      margin-top: 10px;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    /* Storlekar som text */
+    .sizes {
+      margin-top: 10px;
+    }
+    .size-option {
+      display: inline-block;
+      margin: 0px 5px;
+      cursor: pointer;
+      color: #333;
+      font-size: 14px;
+      font-weight: normal;
+    }
+    .size-option.active {
+      text-decoration: underline;
+      color: #000;
+      font-weight: bold;
+    }
+    .cart-section {
+             margin-top: 40px;
+             padding: 20px;
+             background-color: #f9f9f9;
+             border-top: 2px solid #ddd;
+             border-radius: 8px;
+             max-width: 800px;
+             margin-left: auto;
+             margin-right: auto;
+         }
+         .cart-section h2 {
+             font-size: 28px;
+             margin-bottom: 20px;
+             text-align: center;
+             color: #333;
+         }
+         .cart-section button {
+             background-color: transparent;
+             color: #222;
+             border: 2px solid #111;
+             padding: 10px 15px;
+             margin-top: 10px;
+             cursor: pointer;
+             text-align: center;
+         }
+         .cart-item {
+             display: flex;
+             justify-content: space-between;
+             padding: 15px;
+             background-color: white;
+             margin-bottom: 10px;
+             border-radius: 8px;
+             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+             align-items: center;
+         }
+         .cart-item p {
+             margin: 0;
+             font-size: 16px;
+         }
+         .cart-item .product-name {
+             font-weight: bold;
+             color: #333;
+         }
+         .cart-item .price {
+             font-size: 18px;
+             color: #28a745;
+         }
+         .cart-item .remove-item {
+             color: #e74c3c;
+             font-size: 14px;
+             cursor: pointer;
+             text-decoration: underline;
+         }
+         .cart-item .remove-item:hover {
+             color: #c0392b;
+         }
+         .cart-footer {
+             text-align: right;
+             padding: 20px 0;
+             border-top: 2px solid #ddd;
+             font-size: 18px;
+             font-weight: bold;
+             color: #333;
+         }
+         .empty-cart {
+             text-align: center;
+             font-size: 18px;
+             color: #888;
+         }
+         .material-badge {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            background: rgba(1, 185, 151, 0.7);
             color: white;
-            padding: 20px;
+            padding: 8px 16px;
+            font-size: 14px;
+            font-weight: bold;
+            border-radius: 0px 0px 4px 0px;
+        }
+
+        @media (max-width: 600px) {
+        .product-grid {
+            padding: 10px;
+            gap: 15px;
+        }
+        .product h3 {
+            font-size: 14px;
+        }
+        .product p {
+            font-size: 13px;
+        }
+        .cart-item {
+            flex-direction: column;
+            align-items: flex-start;
+            text-align: left;
+        }
+        .cart-footer {
             text-align: center;
+            font-size: 15px;
         }
-        footer a {
-            color: white;
-            text-decoration: none;
-            margin: 0 10px;
+      }
+        .modal {
+          display: none; 
+          position: fixed; 
+          z-index: 1000; 
+          left: 0; top: 0;
+          width: 100%; height: 100%;
+          background-color: rgba(0,0,0,0.6);
         }
-        @media (max-width: 768px) {
-            .nav-links {
-                display: none;
-                flex-direction: column;
-                width: 100%;
-                text-align: center;
-                background-color: #fff;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                padding: 20px;
-            }
-            .nav-links.active {
-                display: flex;
-            }
-            .menu-toggle {
-                display: flex;
-            }
+
+        .modal-content {
+          background: white;
+          margin: 5% auto;
+          padding: 20px;
+          max-width: 600px;
+          border-radius: 8px;
+          text-align: center;
+          position: relative;
         }
-    </style>
+
+        .close {
+          position: absolute;
+          right: 15px;
+          top: 10px;
+          font-size: 28px;
+          cursor: pointer;
+        }
+
+        .modal-images img {
+          width: 50%;
+          max-height: 300px;
+          object-fit: cover;
+          margin-bottom: 10px;
+        }
+
+        #thumbnail-container img {
+          width: 60px;
+          margin: 5px;
+          cursor: pointer;
+          border: 2px solid transparent;
+        }
+
+        #thumbnail-container img:hover {
+          border-color: #000;
+        }
+
+        .desc-toggle {
+          background: none;
+          border: none;
+          color: #222;
+          cursor: pointer;
+          font-weight: 600;
+          padding: 0;
+          margin-top: 5px;
+        }
+        .desc-toggle:hover {
+          text-decoration: underline;
+        }
+        .product-description {
+          margin-top: 8px;
+          color: #444;
+        }
+
+
+  </style>
 </head>
 <body>
     <div class="palette-header">
         <span id="rotating-text">100% återvunna golfbollar!</span>
+      </div> 
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="logo">
+      <a href="index.html"><img src="logo.png"></a>
     </div>
-    <nav class="navbar">
-        <div class="logo">
-            <a href="index.html">
-                <img src="logo.png">
-            </a>
-         </div>
-        <div class="menu-toggle" onclick="toggleMenu()">
-            <div></div>
-            <div></div>
-            <div></div>
+    <div class="menu-toggle" onclick="toggleMenu()">
+      <div></div><div></div><div></div>
+    </div>
+    <ul class="nav-links">
+      <li><a href="golfbollar.html">Golfbollar</a></li>
+      <li><a href="clothes.html">Kläder</a></li>
+      <li><a href="about.html">Info</a></li>
+      <li><a href="contact.html">Kontakt</a></li>
+      <li><a href="#varukorg">Varukorg</a></li>
+    </ul>
+  </nav>
+
+  <!-- Hero -->
+  <section class="hero">
+    <div class="hero-content">
+      <h1>KLÄDER</h1>
+    </div>
+  </section>  
+
+  <!-- Produkter -->
+  <section>
+    <h1 style="text-align:center; margin:20px 0;">Vårt sortiment</h1>
+    <div class="product-grid" id="clothes-grid"></div>
+  </section>
+
+  <!-- Varukorg -->
+  <section class="cart-section" id="varukorg">
+    <h2>Din Varukorg</h2>
+    <div id="cart-items"></div>
+    <div class="cart-footer" id="cart-footer"></div>
+    <center>
+      <button onclick="sendOrder()">Skicka Beställning</button>
+    </center>      
+  </section>
+
+  <!-- Footer -->
+  <footer style="background-color: #222; color: white; padding: 20px; text-align: center;">
+    <div>
+      <a href="mailto:forebollar@gmail.com" style="color: white; text-decoration: none; margin: 0 10px;">Kontakta oss</a>
+    </div>
+    <p>FOREBOLLAR</p>
+  </footer>
+  <!-- Produkt-popup -->
+  <div id="product-modal" class="modal">
+    <div class="modal-content">
+      <span class="close" onclick="closeModal()">&times;</span>
+      <div class="modal-images">
+        <img id="main-image" src="" alt="Produktbild">
+        <div id="thumbnail-container"></div>
+      </div>
+      <h2 id="modal-name"></h2>
+      <p id="modal-material"></p>
+    </div>
+  </div>
+ 
+
+  <script>
+    const clothes = [
+      { name: "Golf Pike Navy Blue", description: "Golf piké i marinblått. Lätt, snabbtorkande polyester som andas och ger bra rörelsefrihet.", price: 249, image: "PikeBl.png", material: "Polyester", images: ["PikeBl.png",]},
+      { name: "Golf Pike Navy/White", description: "Golf piké i navy med vit krage. Lätt, snabbtorkande polyester som andas och ger bra rörelsefrihet.", price: 249, image: "PikeBlw.png", material: "Polyester" },
+      { name: "Golf Pike Black/White", description: "Golf piké i svart med vit krage. Lätt, snabbtorkande polyester som andas och ger bra rörelsefrihet.", price: 249, image: "PikeBW.png", material: "Polyester" },
+      { name: "Golf Hoodie Black", description: "Svart hoodie från ForeBollar med stilren design och funktionellt material. Lätt, stretchig polyester som andas, torkar snabbt och ger full rörelsefrihet på och utanför banan.", price: 349, image: "HoodieB.png", material: "Polyester" }
+    ];
+
+    const sizes = ["S", "M", "L", "XL"];
+    const grid = document.getElementById("clothes-grid");
+
+    clothes.forEach((product, index) => {
+      let div = document.createElement("div");
+      div.classList.add("product");
+
+      // bygg storleksknappar
+      let sizeHTML = sizes.map(size => 
+        `<span class="size-option" onclick="selectSize(${index}, '${size}')">${size}</span>`
+      ).join(" ");
+
+      div.innerHTML = `
+        <div class="material-badge">${product.material}</div>
+        <img src="${product.image}" alt="${product.name}" onclick="openModal(${index})">
+        <h3>${product.name}</h3>
+        <div class="description-container">
+          <button class="desc-toggle" onclick="toggleDescription(this)">Visa beskrivning ▼</button>
+          <p class="product-description" style="display:none;">${product.description}</p>
         </div>
-        <ul class="nav-links">
-            <li><a href="golfbollar.html">Golfbollar</a></li>
-            <li><a href="clothes.html">Kläder</a></li>
-            <li><a href="about.html">Info</a></li>
-            <li><a href="contact.html">Kontakt</a></li>
-            <li><a href="index.html#varukorg">Varukorg</a></li>
-        </ul>
-    </nav>
-    <section class="hero">
-        <div class="hero-content">
-            <h1>KLÄDER</h1>
-            <p>Kommer Snart!</p>
-        </div>
-    </section>
-    <footer>
-        <a href="mailto:forebollar@gmail.com">Kontakta oss</a>
-        <p>FOREBOLLAR</p>
-    </footer>
+        <br>
+        <p>${product.price} kr</p>
+        <div class="sizes" id="sizes-${index}">${sizeHTML}</div>
+        <button class="cart-btn" onclick="addToCart(${index})">Lägg till i varukorg</button>
+      `;
+
+      grid.appendChild(div);
+    });
+
+    let cart = JSON.parse(localStorage.getItem("cart")) || [];
+    let selectedSizes = {}; // lagrar vald storlek för varje produkt
+
+    function selectSize(productIndex, size) {
+      selectedSizes[productIndex] = size;
+
+      // ta bort active från alla storlekar
+      const sizeElems = document.querySelectorAll(`#sizes-${productIndex} .size-option`);
+      sizeElems.forEach(el => el.classList.remove("active"));
+
+      // markera vald storlek
+      const clicked = Array.from(sizeElems).find(el => el.textContent === size);
+      if (clicked) clicked.classList.add("active");
+    }
+
+    function addToCart(index) {
+      const chosenSize = selectedSizes[index];
+      if (!chosenSize) {
+        alert("Du måste välja en storlek innan du kan lägga till i varukorgen!");
+        return;
+      }
+
+      const product = clothes[index];
+      const productWithSize = { ...product, size: chosenSize };
+
+      cart.push(productWithSize);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartDisplay();
+      alert(`${product.name} (${chosenSize}) har lagts till i varukorgen!`);
+    }
+
+    function removeFromCart(index) {
+      cart.splice(index, 1);
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartDisplay();
+    }
+
+    function updateCartDisplay() {
+      const cartItemsContainer = document.getElementById("cart-items");
+      cartItemsContainer.innerHTML = "";
+      if (cart.length === 0) {
+        cartItemsContainer.innerHTML = "<p class='empty-cart'>Din varukorg är tom.</p>";
+        document.getElementById("cart-footer").innerHTML = "";
+      } else {
+        let totalPrice = 0;
+        cart.forEach((item, index) => {
+          const cartItemDiv = document.createElement("div");
+          cartItemDiv.classList.add("cart-item");
+          cartItemDiv.innerHTML = `
+            <p class="product-name">${item.name} (Storlek: ${item.size}) - ${item.price} kr</p>
+            <p><span class="remove-item" onclick="removeFromCart(${index})">Ta bort</span></p>
+          `;
+          cartItemsContainer.appendChild(cartItemDiv);
+          totalPrice += item.price;
+        });
+        document.getElementById("cart-footer").innerHTML = `Total: ${totalPrice.toFixed(2)} kr`;
+      }
+    }
+
+    function sendOrder() {
+      if (cart.length === 0) {
+        alert("Varukorgen är tom!");
+        return;
+      }
+      alert("Beställning skickad!");
+      cart = [];
+      localStorage.setItem("cart", JSON.stringify(cart));
+      updateCartDisplay();
+    }
+
+    updateCartDisplay();
+
+    function openModal(index) {
+      const product = clothes[index];
+
+      // sätt info
+      document.getElementById("modal-name").textContent = product.name;
+      document.getElementById("modal-material").textContent = "Material: 100% " + product.material;
+
+      // bilder
+      const mainImage = document.getElementById("main-image");
+      const thumbnails = document.getElementById("thumbnail-container");
+      thumbnails.innerHTML = "";
+      let images = product.images || [product.image];
+      mainImage.src = images[0];
+      images.forEach(img => {
+        let thumb = document.createElement("img");
+        thumb.src = img;
+        thumb.onclick = () => { mainImage.src = img; };
+        thumbnails.appendChild(thumb);
+      });
+
+      document.getElementById("product-modal").style.display = "block";
+    }
+
+    function closeModal() {
+      document.getElementById("product-modal").style.display = "none";
+    }
+
+    function toggleDescription(button) {
+      const desc = button.nextElementSibling;
+      if (desc.style.display === "none") {
+        desc.style.display = "block";
+        button.textContent = "Dölj beskrivning ▲";
+      } else {
+        desc.style.display = "none";
+        button.textContent = "Visa beskrivning ▼";
+      }
+    }
+
+
+  </script>
+
 </body>
 </html>
