@@ -475,11 +475,11 @@
          </div>
          <p>FOREBOLLAR</p>
      </footer>    
- 
      <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-     <script>
-         emailjs.init("M8hlcCoiJItfe70PT"); // Ersätt med din EmailJS Public Key
- 
+    <script>
+        emailjs.init("M8hlcCoiJItfe70PT");
+    </script>
+     <script> 
          function saveCart() {
              localStorage.setItem("cart", JSON.stringify(cart));
          }
@@ -720,32 +720,34 @@
 
  
             function addToCart(index) {
-                const qualitySelect = document.getElementById(`quality-${index}`);
-                const selectedQuality = qualitySelect.value;
-                const product = products[index];
+            const qualitySelect = document.getElementById(`quality-${index}`);
+            const selectedQuality = qualitySelect.value;
+            const product = products[index];
 
-                if (selectedQuality === "firsthand" && product.stockStatusFirsthand === "Slutsåld") {
-                    alert("Denna produkt är slutsåld!");
-                    return;
-                }
-                if (selectedQuality === "secondhand" && product.stockStatusSecondhand === "Slutsåld") {
-                    alert("Denna produkt är slutsåld!");
-                    return;
-                }
-
-                let finalPrice = getCurrentPrice(product, selectedQuality);
-
-                const productWithPrice = { 
-                    ...product, 
-                    price: finalPrice.toFixed(2), 
-                    quality: selectedQuality === "firsthand" ? "1:a sortering" : "2:a sortering"
-                };
-
-                cart.push(productWithPrice);
-                saveCart();
-                updateCartDisplay();
-                alert(`${product.name} (${productWithPrice.quality}) har lagts till i varukorgen!`);
+            if (selectedQuality === "firsthand" && product.stockStatusFirsthand === "Slutsåld") {
+                alert("Denna produkt är slutsåld!");
+                return;
             }
+            if (selectedQuality === "secondhand" && product.stockStatusSecondhand === "Slutsåld") {
+                alert("Denna produkt är slutsåld!");
+                return;
+            }
+
+            let finalPrice = getCurrentPrice(product, selectedQuality);
+
+            const productWithPrice = { 
+                ...product, 
+                price: finalPrice.toFixed(2), 
+                quality: selectedQuality === "firsthand" ? "1:a sortering" : "2:a sortering",
+                category: "golfballs"
+            };
+
+            cart.push(productWithPrice);
+            saveCart();
+            updateCartDisplay();
+            alert(`${product.name} (${productWithPrice.quality}) har lagts till i varukorgen!`);
+            }
+
 
  
          function removeFromCart(index) {
@@ -755,26 +757,49 @@
          }
  
          function updateCartDisplay() {
-                const cartItemsContainer = document.getElementById("cart-items");
-                cartItemsContainer.innerHTML = "";
-                if (cart.length === 0) {
-                    cartItemsContainer.innerHTML = "<p class='empty-cart'>Din varukorg är tom.</p>";
-                    document.getElementById("cart-footer").innerHTML = "";
-                } else {
-                    let totalPrice = 0;
-                    cart.forEach((item, index) => {
-                        const cartItemDiv = document.createElement("div");
-                        cartItemDiv.classList.add("cart-item");
-                        cartItemDiv.innerHTML = `
-                            <p class="product-name">${item.name} (${item.quality}, ${item.lining}) - ${item.price} kr</p>
-                            <p><span class="remove-item" onclick="removeFromCart(${index})">Ta bort</span></p>
-                        `;
-                        cartItemsContainer.appendChild(cartItemDiv);
-                        totalPrice += parseFloat(item.price);
-                    });
-                    document.getElementById("cart-footer").innerHTML = `Total: ${totalPrice.toFixed(2)} kr`;
-                }
+            const cartItemsContainer = document.getElementById("cart-items");
+            cartItemsContainer.innerHTML = "";
+
+            if (cart.length === 0) {
+                cartItemsContainer.innerHTML = "<p class='empty-cart'>Din varukorg är tom.</p>";
+                document.getElementById("cart-footer").innerHTML = "";
+                return;
             }
+
+            let totalPrice = 0;
+            const clothesItems = cart.filter(i => i.category === "clothes");
+            const golfballItems = cart.filter(i => i.category === "golfballs");
+
+            function renderGroup(title, items) {
+                if (items.length === 0) return;
+                const groupTitle = document.createElement("h3");
+                groupTitle.textContent = title;
+                groupTitle.style.marginTop = "15px";
+                groupTitle.style.color = "#333";
+                cartItemsContainer.appendChild(groupTitle);
+
+                items.forEach((item, index) => {
+                const cartItemDiv = document.createElement("div");
+                cartItemDiv.classList.add("cart-item");
+                const info =
+                    item.category === "clothes"
+                    ? `${item.name} (Storlek: ${item.size})`
+                    : `${item.name} (${item.quality})`;
+                cartItemDiv.innerHTML = `
+                    <p class="product-name">${info} - ${item.price} kr</p>
+                    <p><span class="remove-item" onclick="removeFromCart(${cart.indexOf(item)})">Ta bort</span></p>
+                `;
+                cartItemsContainer.appendChild(cartItemDiv);
+                totalPrice += parseFloat(item.price);
+                });
+            }
+
+            renderGroup("Golfbollar", golfballItems);
+            renderGroup("Kläder", clothesItems);
+
+            document.getElementById("cart-footer").innerHTML = `Total: ${totalPrice.toFixed(2)} kr`;
+            }
+
 
  
          function sendOrder() {

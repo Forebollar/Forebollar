@@ -291,11 +291,27 @@
     </div>
   </div>
  
-
   <script>
+    function toggleMenu() {
+      const menu = document.querySelector('.nav-links');
+      menu.classList.toggle('active');
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+  <script>
+    emailjs.init("M8hlcCoiJItfe70PT"); // Samma nyckel som i golfbollar.html
+
+    function saveCart() {
+      localStorage.setItem("cart", JSON.stringify(cart));
+    }
+
+    function loadCart() {
+      return JSON.parse(localStorage.getItem("cart")) || [];
+    }
+
     const clothes = [
-      { name: "Golf Pike Navy Blue", description: "Golf piké i marinblått. Lätt, snabbtorkande polyester som andas och ger bra rörelsefrihet.", price: 249, image: "PikeBl.png", material: "Polyester", images: ["PikeBl.png",]},
-      { name: "Golf Pike Navy/White", description: "Golf piké i navy med vit krage. Lätt, snabbtorkande polyester som andas och ger bra rörelsefrihet.", price: 249, image: "PikeBlW.png", material: "Polyester" },
+      { name: "Golf Pike Navy Blue", description: "Golf piké i marinblått. Lätt, snabbtorkande polyester som andas och ger bra rörelsefrihet.", price: 249, image: "PikeBl.png", material: "Polyester", images: ["PikeBl.png"] },
+      { name: "Golf Pike Navy/White", description: "Golf piké i navy med vit krage. Lätt, snabbtorkande polyester som andas och ger bra rörelsefrihet.", price: 249, image: "PikeBlw.png", material: "Polyester" },
       { name: "Golf Pike Black/White", description: "Golf piké i svart med vit krage. Lätt, snabbtorkande polyester som andas och ger bra rörelsefrihet.", price: 249, image: "PikeBW.png", material: "Polyester" },
       { name: "Golf Hoodie Black", description: "Svart hoodie från ForeBollar med stilren design och funktionellt material. Lätt, stretchig polyester som andas, torkar snabbt och ger full rörelsefrihet på och utanför banan.", price: 349, image: "HoodieB.png", material: "Polyester" }
     ];
@@ -303,12 +319,15 @@
     const sizes = ["S", "M", "L", "XL"];
     const grid = document.getElementById("clothes-grid");
 
+    let cart = loadCart();
+    let selectedSizes = {}; // lagrar vald storlek per produkt
+
     clothes.forEach((product, index) => {
       let div = document.createElement("div");
       div.classList.add("product");
 
       // bygg storleksknappar
-      let sizeHTML = sizes.map(size => 
+      let sizeHTML = sizes.map(size =>
         `<span class="size-option" onclick="selectSize(${index}, '${size}')">${size}</span>`
       ).join(" ");
 
@@ -329,86 +348,134 @@
       grid.appendChild(div);
     });
 
-    let cart = JSON.parse(localStorage.getItem("cart")) || [];
-    let selectedSizes = {}; // lagrar vald storlek för varje produkt
+    function toggleDescription(button) {
+      const desc = button.nextElementSibling;
+      if (desc.style.display === "none") {
+        desc.style.display = "block";
+        button.textContent = "Dölj beskrivning ▲";
+      } else {
+        desc.style.display = "none";
+        button.textContent = "Visa beskrivning ▼";
+      }
+    }
 
     function selectSize(productIndex, size) {
       selectedSizes[productIndex] = size;
-
-      // ta bort active från alla storlekar
       const sizeElems = document.querySelectorAll(`#sizes-${productIndex} .size-option`);
       sizeElems.forEach(el => el.classList.remove("active"));
-
-      // markera vald storlek
       const clicked = Array.from(sizeElems).find(el => el.textContent === size);
       if (clicked) clicked.classList.add("active");
     }
 
     function addToCart(index) {
-      const chosenSize = selectedSizes[index];
-      if (!chosenSize) {
-        alert("Du måste välja en storlek innan du kan lägga till i varukorgen!");
-        return;
-      }
-
-      const product = clothes[index];
-      const productWithSize = { ...product, size: chosenSize };
-
-      cart.push(productWithSize);
-      localStorage.setItem("cart", JSON.stringify(cart));
-      updateCartDisplay();
-      alert(`${product.name} (${chosenSize}) har lagts till i varukorgen!`);
+    const chosenSize = selectedSizes[index];
+    if (!chosenSize) {
+      alert("Du måste välja en storlek innan du kan lägga till i varukorgen!");
+      return;
     }
+
+    const product = clothes[index];
+    const productWithSize = { 
+      ...product, 
+      size: chosenSize, 
+      category: "clothes"
+    };
+
+    cart.push(productWithSize);
+    saveCart();
+    updateCartDisplay();
+    alert(`${product.name} (${chosenSize}) har lagts till i varukorgen!`);
+  }
+
 
     function removeFromCart(index) {
       cart.splice(index, 1);
-      localStorage.setItem("cart", JSON.stringify(cart));
+      saveCart();
       updateCartDisplay();
     }
 
     function updateCartDisplay() {
-      const cartItemsContainer = document.getElementById("cart-items");
-      cartItemsContainer.innerHTML = "";
-      if (cart.length === 0) {
-        cartItemsContainer.innerHTML = "<p class='empty-cart'>Din varukorg är tom.</p>";
-        document.getElementById("cart-footer").innerHTML = "";
-      } else {
+        const cartItemsContainer = document.getElementById("cart-items");
+        cartItemsContainer.innerHTML = "";
+
+        if (cart.length === 0) {
+          cartItemsContainer.innerHTML = "<p class='empty-cart'>Din varukorg är tom.</p>";
+          document.getElementById("cart-footer").innerHTML = "";
+          return;
+        }
+
         let totalPrice = 0;
-        cart.forEach((item, index) => {
-          const cartItemDiv = document.createElement("div");
-          cartItemDiv.classList.add("cart-item");
-          cartItemDiv.innerHTML = `
-            <p class="product-name">${item.name} (Storlek: ${item.size}) - ${item.price} kr</p>
-            <p><span class="remove-item" onclick="removeFromCart(${index})">Ta bort</span></p>
-          `;
-          cartItemsContainer.appendChild(cartItemDiv);
-          totalPrice += item.price;
-        });
+        const clothesItems = cart.filter(i => i.category === "clothes");
+        const golfballItems = cart.filter(i => i.category === "golfballs");
+
+        function renderGroup(title, items) {
+          if (items.length === 0) return;
+          const groupTitle = document.createElement("h3");
+          groupTitle.textContent = title;
+          groupTitle.style.marginTop = "15px";
+          groupTitle.style.color = "#333";
+          cartItemsContainer.appendChild(groupTitle);
+
+          items.forEach((item, index) => {
+            const cartItemDiv = document.createElement("div");
+            cartItemDiv.classList.add("cart-item");
+            const info =
+              item.category === "clothes"
+                ? `${item.name} (Storlek: ${item.size})`
+                : `${item.name} (${item.quality})`;
+            cartItemDiv.innerHTML = `
+              <p class="product-name">${info} - ${item.price} kr</p>
+              <p><span class="remove-item" onclick="removeFromCart(${cart.indexOf(item)})">Ta bort</span></p>
+            `;
+            cartItemsContainer.appendChild(cartItemDiv);
+            totalPrice += parseFloat(item.price);
+          });
+        }
+
+        renderGroup("Golfbollar", golfballItems);
+        renderGroup("Kläder", clothesItems);
+
         document.getElementById("cart-footer").innerHTML = `Total: ${totalPrice.toFixed(2)} kr`;
       }
-    }
+
 
     function sendOrder() {
+      let customerEmail = prompt("Ange din Mail (Gmail, Hotmail, icloud):");
+
+      if (!customerEmail || !customerEmail.match(/(@gmail\.com|@hotmail\.com|@icloud\.com)$/)) {
+        alert("Du måste ange en giltig e-postadress från Gmail, Hotmail eller iCloud!");
+        return;
+      }
+
       if (cart.length === 0) {
         alert("Varukorgen är tom!");
         return;
       }
-      alert("Beställning skickad!");
-      cart = [];
-      localStorage.setItem("cart", JSON.stringify(cart));
-      updateCartDisplay();
+
+      let orderDetails = cart.map(item => `- ${item.name} (${item.size}) - ${item.price} kr`).join("\n");
+
+      let emailParams = {
+        customer_email: customerEmail,
+        order: orderDetails
+      };
+
+      emailjs.send("service_hopnllq", "template_9k0lu8p", emailParams)
+        .then(() => {
+          alert("Beställning skickad!");
+          cart = [];
+          saveCart();
+          updateCartDisplay();
+        })
+        .catch(err => alert("Fel vid skickning: " + err));
     }
 
     updateCartDisplay();
 
     function openModal(index) {
       const product = clothes[index];
-
-      // sätt info
       document.getElementById("modal-name").textContent = product.name;
       document.getElementById("modal-material").textContent = "Material: 100% " + product.material;
 
-      // bilder
       const mainImage = document.getElementById("main-image");
       const thumbnails = document.getElementById("thumbnail-container");
       thumbnails.innerHTML = "";
@@ -427,20 +494,8 @@
     function closeModal() {
       document.getElementById("product-modal").style.display = "none";
     }
-
-    function toggleDescription(button) {
-      const desc = button.nextElementSibling;
-      if (desc.style.display === "none") {
-        desc.style.display = "block";
-        button.textContent = "Dölj beskrivning ▲";
-      } else {
-        desc.style.display = "none";
-        button.textContent = "Visa beskrivning ▼";
-      }
-    }
-
-
   </script>
+
 
 </body>
 </html>
