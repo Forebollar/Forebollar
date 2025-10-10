@@ -318,6 +318,39 @@
             cursor: pointer;
         }
 
+        .split-images {
+            display: flex;
+            width: 100%;
+            }
+
+            .split-images div {
+            position: relative;
+            flex: 1;
+            }
+
+            .split-images img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            }
+
+            .split-text {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: white;
+            }
+
+            .split-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: white;
+            color: black;
+            text-decoration: none;
+            }
+
+
         @media (max-width: 768px) {
             #slider {
                 display: flex;
@@ -408,6 +441,56 @@
             margin-bottom: 5px;
         }
 
+        .goto-btn {
+            display: inline-block;
+            margin-top: 10px;
+            padding: 10px 15px;
+            background: transparent;
+            color: black;
+            border: 2px solid black;
+            text-decoration: none;
+            transition: 0.3s;
+            }
+
+            .goto-btn:hover {
+            background: #c6c6c659;
+            }
+
+            .split-images {
+                display: flex;
+                width: 100%;
+                }
+
+                .split-images div {
+                position: relative;
+                flex: 1;
+                }
+
+                .split-images img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                }
+
+                .split-btn {
+                position: absolute;
+                bottom: 20px;
+                left: 20px;
+                padding: 10px 15px;
+                background: transparent;
+                color: white;
+                border: 2px solid white;
+                cursor: pointer;
+                font-size: 16px;
+                transition: 0.3s;
+                }
+
+                .split-btn:hover {
+                background: #c6c6c659;
+                }
+
+
+
 
 
 
@@ -442,18 +525,28 @@
             <p></p>
         </div>
     </section>    
-    
-     <section id="featured-product-section"></section>
-     <script src="featured-product.js"></script>
  
-     <section class="slider-container">
-         <h1>Vårt sortiment</h1>
-         <div class="product-slider" id="slider"></div>
-         <div class="arrows">
-             <span class="arrow" id="prev">&#8592;</span>
-             <span class="arrow" id="next">&#8594;</span>
-         </div>
-     </section>
+    <section class="split-images">
+        <div class="split-left">
+          <img src="golfbollar1.png" alt="golfboll">
+          <a href="golfbollar.html">
+            <button class="split-btn">Golfbollar →</button>
+          </a>
+        </div>
+        <div class="split-right">
+          <img src="kläder2.png" alt="kläder">
+          <a href="clothes.html">
+            <button class="split-btn">Kläder →</button>
+          </a>
+        </div>
+      </section>
+      
+      
+      <section class="slider-container">
+        <h1>Bästsäljare</h1>
+        <div class="product-slider" id="bestsellers"></div>
+      </section>
+      
  
      <section class="cart-section" id="varukorg">
          <h2>Din Varukorg</h2>
@@ -502,6 +595,7 @@
         ];
 
 
+
  
          const products = [
                 { name: "Titleist Pro V1/V1x - 12st", price: 190, comparePrice: 399, image: "Golfbollar/Pro-V1.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "Pro V1 är golfbollen som presterar maximalt i alla delar av spelet med ökad längd, låg spinn från tee och penetrerande bollflykt." },
@@ -518,6 +612,36 @@
                 { name: "Wilson Mix - 12st", price: 100, comparePrice: 160, image: "Golfbollar/wilson-mix.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "En mix av Wilson golfbollar – bra kvalitet till ett fantastiskt pris, perfekt för spelare som vill ha pålitliga bollar utan att spräcka budgeten! " },
                 { name: "Srixon Mix - 12st", price: 110, comparePrice: 190, image: "Golfbollar/srixon.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: " Här kan du köpa en prisvärd mix av Srixons golfbollar, perfekt för medel och höghandicapare. Mixen innehåller populära modeller som Q-Star, Distance, Hi-Spin och AD333, m.m." },
             ];
+
+            const bestsellers = [
+                {
+                    ...products[0],
+                    link: "golfbollar.html"
+                },
+                {
+                    ...products[10],
+                    link: "golfbollar.html"
+                },
+                {
+                    ...products[7],
+                    link: "golfbollar.html"
+                }
+                ];
+
+                const bestsellerSlider = document.getElementById("bestsellers");
+
+                bestsellers.forEach((product) => {
+                let div = document.createElement("div");
+                div.classList.add("product");
+                div.innerHTML = `
+                    <img src="${product.image}" alt="${product.name}">
+                    <h3>${product.name}</h3>
+                    <p>${product.price} kr</p>
+                    <a href="${product.link}" class="goto-btn">Ta mig dit →</a>
+                `;
+                bestsellerSlider.appendChild(div);
+                });
+
 
             let cart = loadCart();
             const slider = document.getElementById("slider");
