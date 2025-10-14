@@ -224,6 +224,102 @@
           color: #444;
         }
 
+        .toast {
+          position: fixed;
+          bottom: 30px;
+          right: 30px;
+          background: #111;
+          color: white;
+          padding: 15px 25px;
+          border-radius: 8px;
+          box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+          opacity: 0;
+          transform: translateY(20px);
+          transition: all 0.4s ease;
+          z-index: 2000;
+          font-size: 16px;
+        }
+
+        .toast.show {
+          opacity: 1;
+          transform: translateY(0);
+        }
+
+        .order-modal {
+          display: none;
+          position: fixed;
+          z-index: 2000;
+          left: 0; top: 0;
+          width: 100%; height: 100%;
+          background-color: rgba(0, 0, 0, 0.6);
+          justify-content: center;
+          align-items: center;
+        }
+
+        .order-modal-content {
+          background: white;
+          padding: 30px;
+          border-radius: 12px;
+          width: 90%;
+          max-width: 400px;
+          text-align: left;
+          position: relative;
+          animation: fadeIn 0.3s ease;
+        }
+
+        .order-modal-content h2 {
+          text-align: center;
+          margin-bottom: 15px;
+        }
+
+        .order-modal-content label {
+          display: block;
+          margin-top: 10px;
+          font-weight: 600;
+          font-size: 15px;
+        }
+
+        .order-modal-content input {
+          width: 100%;
+          padding: 10px;
+          margin-top: 5px;
+          border: 1px solid #ccc;
+          border-radius: 6px;
+          font-size: 15px;
+        }
+
+        .order-modal-content button {
+          width: 100%;
+          margin-top: 20px;
+          background-color: #111;
+          color: white;
+          border: none;
+          padding: 12px;
+          font-size: 16px;
+          border-radius: 6px;
+          cursor: pointer;
+        }
+
+        .order-modal-content button:hover {
+          background-color: #333;
+        }
+
+        .summary-box {
+          margin-top: 15px;
+          background: #f8f8f8;
+          padding: 10px;
+          border-radius: 8px;
+          font-size: 15px;
+          line-height: 1.6;
+        }
+
+        .risk-text {
+            font-size: 12px;
+            color: #555;
+            margin-top: 15px;
+            line-height: 1.5;
+        }
+
 
   </style>
 </head>
@@ -267,7 +363,7 @@
     <div id="cart-items"></div>
     <div class="cart-footer" id="cart-footer"></div>
     <center>
-      <button onclick="sendOrder()">Skicka Beställning</button>
+      <button onclick="openOrderModal()">Skicka Beställning</button>
     </center>      
   </section>
 
@@ -290,6 +386,36 @@
       <p id="modal-material"></p>
     </div>
   </div>
+
+  <!-- Beställnings-popup -->
+  <div id="orderModal" class="order-modal">
+    <div class="order-modal-content">
+      <span class="close" onclick="closeOrderModal()">&times;</span>
+      <h2>Skicka din beställning</h2>
+      <form id="orderForm" onsubmit="submitOrder(event)">
+        <label for="email">E-postadress:</label>
+        <input type="email" id="email" name="email" placeholder="Din e-postadress" required>
+  
+        <label for="phone">Telefonnummer:</label>
+        <input type="tel" id="phone" name="phone" placeholder="Telefonnummer" required>
+  
+        <div id="orderSummary" class="summary-box"></div>
+
+        <div class="risk-text">
+          <p>
+              Genom att skicka beställningen godkänner du att Forebollar behandlar dina uppgifter 
+              för att hantera din order och du att du vill genomföra köpet.
+              Ingen betalning sker vid detta steg – du betalar först när vi bekräftat din order.
+              
+              Vi hanterar dina personuppgifter enligt GDPR. Dina uppgifter används endast för att 
+              kontakta dig angående din beställning och delas inte med tredje part.                    
+          </p>
+      </div>
+
+      <button type="submit">Skicka Beställning</button>
+      </form>
+    </div>
+  </div>  
  
   <script>
     function toggleMenu() {
@@ -370,7 +496,7 @@
     function addToCart(index) {
     const chosenSize = selectedSizes[index];
     if (!chosenSize) {
-      alert("Du måste välja en storlek innan du kan lägga till i varukorgen!");
+      showToast("Du måste välja en storlek innan du kan lägga till i varukorgen!");
       return;
     }
 
@@ -384,7 +510,7 @@
     cart.push(productWithSize);
     saveCart();
     updateCartDisplay();
-    alert(`${product.name} (${chosenSize}) har lagts till i varukorgen!`);
+    showToast(`${product.name} (${chosenSize}) har lagts till i varukorgen!`);
   }
 
 
@@ -439,35 +565,81 @@
       }
 
 
-    function sendOrder() {
-      let customerEmail = prompt("Ange din Mail (Gmail, Hotmail, icloud):");
+      function openOrderModal() {
+          let customerEmail = prompt("Ange din Mail (Gmail, Hotmail, icloud):");
 
-      if (!customerEmail || !customerEmail.match(/(@gmail\.com|@hotmail\.com|@icloud\.com)$/)) {
-        alert("Du måste ange en giltig e-postadress från Gmail, Hotmail eller iCloud!");
-        return;
-      }
+          if (!customerEmail || !customerEmail.match(/(@gmail\.com|@hotmail\.com|@icloud\.com)$/)) {
+            showToast("Du måste ange en giltig e-postadress från Gmail, Hotmail eller iCloud!");
+            return;
+          }
 
-      if (cart.length === 0) {
-        alert("Varukorgen är tom!");
-        return;
-      }
+          if (cart.length === 0) {
+            showToast("Varukorgen är tom!");
+            return;
+          }
 
-      let orderDetails = cart.map(item => `- ${item.name} (${item.size}) - ${item.price} kr`).join("\n");
+          // Bygg upp orderinnehållet exakt som i varukorgen
+          let totalPrice = 0;
+          let orderLines = cart.map(item => {
+            let info = item.category === "clothes"
+              ? `${item.name} (Storlek: ${item.size})`
+              : `${item.name} (${item.quality})`;
+            totalPrice += parseFloat(item.price);
+            return `• ${info} - ${item.price} kr`;
+          }).join("\n");
 
-      let emailParams = {
-        customer_email: customerEmail,
-        order: orderDetails
-      };
+          let orderDetails = `
+          Ny beställning
+          -------------------------
+          ${orderLines}
+          -------------------------
+          Total: ${totalPrice.toFixed(2)} kr
+          `;
 
-      emailjs.send("service_hopnllq", "template_9k0lu8p", emailParams)
-        .then(() => {
-          alert("Beställning skickad!");
-          cart = [];
-          saveCart();
-          updateCartDisplay();
-        })
-        .catch(err => alert("Fel vid skickning: " + err));
-    }
+          let emailParams = {
+            customer_email: customerEmail,
+            order: orderDetails
+          };
+
+          emailjs.send("service_hopnllq", "template_9k0lu8p", emailParams)
+            .then(() => {
+              showToast("Beställning skickad!");
+              cart = [];
+              saveCart();
+              updateCartDisplay();
+            })
+            .catch(err => showToast("Fel vid skickning: " + err));
+        }
+
+        function openOrderModal() {
+          if (cart.length === 0) {
+            showToast("Varukorgen är tom!");
+            return;
+          }
+
+          const summary = document.getElementById("orderSummary");
+          let total = 0;
+          let itemsHTML = cart.map(item => {
+            let info = item.category === "clothes"
+              ? `${item.name} (Storlek: ${item.size})`
+              : `${item.name} (${item.quality})`;
+            total += parseFloat(item.price);
+            return `<div>• ${info} - ${item.price} kr</div>`;
+          }).join("");
+
+          summary.innerHTML = `
+            <strong>Din beställning:</strong><br>
+            ${itemsHTML}
+            <hr>
+            <strong>Total: ${total.toFixed(2)} kr</strong>
+          `;
+
+          document.getElementById("orderModal").style.display = "flex";
+        }
+
+        function closeOrderModal() {
+          document.getElementById("orderModal").style.display = "none";
+        }
 
     updateCartDisplay();
 
@@ -494,6 +666,67 @@
     function closeModal() {
       document.getElementById("product-modal").style.display = "none";
     }
+
+    function showToast(message, duration = 2500) {
+      const toast = document.createElement("div");
+      toast.classList.add("toast");
+      toast.textContent = message;
+      document.body.appendChild(toast);
+
+      setTimeout(() => toast.classList.add("show"), 50); // Fade in
+      setTimeout(() => {
+        toast.classList.remove("show"); // Fade out
+        setTimeout(() => toast.remove(), 300);
+      }, duration);
+    }
+
+    function submitOrder(event) {
+            event.preventDefault();
+
+            const email = document.getElementById("email").value;
+            const phone = document.getElementById("phone").value;
+
+            if (cart.length === 0) {
+                showToast("Varukorgen är tom!");
+                return;
+            }
+
+            let totalPrice = 0;
+            let orderLines = cart.map(item => {
+                let info = item.category === "clothes"
+                ? `${item.name} (Storlek: ${item.size})`
+                : `${item.name} (${item.quality})`;
+                totalPrice += parseFloat(item.price);
+                return `• ${info} - ${item.price} kr`;
+            }).join("\n");
+
+            const orderDetails = `
+            Ny beställning
+            -------------------------
+            ${orderLines}
+            -------------------------
+            Total: ${totalPrice.toFixed(2)} kr
+            E-post: ${email}
+            Telefon: ${phone}
+            `;
+
+            const emailParams = {
+                customer_email: email,
+                phone: phone,
+                order: orderDetails
+            };
+
+            emailjs.send("service_hopnllq", "template_9k0lu8p", emailParams)
+                .then(() => {
+                showToast("Beställning skickad!");
+                cart = [];
+                saveCart();
+                updateCartDisplay();
+                closeOrderModal();
+                })
+                .catch(err => showToast("Fel vid skickning: " + err));
+            }
+
   </script>
 
 
