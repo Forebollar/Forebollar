@@ -38,7 +38,6 @@ body {
     animation: slideDown 0.8s ease-out forwards;
     z-index: 999;
     max-height: 60px;
-    text-transform: uppercase;
 }
 .logo {
     font-size: 24px;
@@ -46,15 +45,15 @@ body {
     font-family: Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
 }
 .logo img {
-   width: 150px;
+   width: 225px;
 }
 .nav-links {
     list-style: none;
     display: flex;
-    gap: 20px;
+    gap: 30px;
     padding: 0;
     margin: 0;
-    margin-right: 40px;
+    margin-right: 100px;
 }
 .nav-links li {
     display: inline;
@@ -62,13 +61,14 @@ body {
 .nav-links a {
     text-decoration: none;
     color: #222;
-    font-size: 18px;
+    font-size: 22px;
     font-weight: bold;
     transition: color 0.3s, transform 0.3s;
     position: relative;
+    font-family: "Amsterdam Four_ttf";
 }
 .nav-links a:hover {
-    color: #222;
+    color: #333;
     transform: scale(1.1);
 }
 .menu-toggle {
@@ -100,16 +100,31 @@ body {
     justify-content: center;
     text-align: center;
     padding: 20px;
-
     margin: 0; /* viktigt */
 }
     
 
+@font-face {
+    font-family: "Amsterdam Four_ttf";
+    src: url("https://db.onlinewebfonts.com/t/07cb29fdcb073fff840edc6de2067b50.eot");
+    src: url("https://db.onlinewebfonts.com/t/07cb29fdcb073fff840edc6de2067b50.eot?#iefix")format("embedded-opentype"),
+    url("https://db.onlinewebfonts.com/t/07cb29fdcb073fff840edc6de2067b50.woff2")format("woff2"),
+    url("https://db.onlinewebfonts.com/t/07cb29fdcb073fff840edc6de2067b50.woff")format("woff"),
+    url("https://db.onlinewebfonts.com/t/07cb29fdcb073fff840edc6de2067b50.ttf")format("truetype"),
+    url("https://db.onlinewebfonts.com/t/07cb29fdcb073fff840edc6de2067b50.svg#Amsterdam Four_ttf")format("svg");
+}
+
 .hero h1 {
-    font-size: 48px;
+    font-size: 58px;
     padding: 20px;
     border-radius: 10px;
     color: #fff;
+    font-family: "Amsterdam Four_ttf";
+    color: white;
+    margin-top: 50px;
+    line-height: 1.2;
+    letter-spacing: 2px; 
+    -webkit-font-smoothing: antialiased;
 }
 
 .hero-content {
