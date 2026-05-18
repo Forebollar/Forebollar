@@ -9,6 +9,9 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#14231C">
+    <link rel="apple-touch-icon" href="logowebb.png">
     
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #FCFCFB; }
@@ -279,6 +282,15 @@
 
         window.onload = () => { renderSlider(); updateCartUI(); };
         window.addEventListener('resize', updateSlider);
+    </script>
+    <script>
+        if ('serviceWorker' in navigator) {
+        window.addEventListener('load', () => {
+            navigator.serviceWorker.register('sw.js')
+            .then(reg => console.log('Service Worker registrerad!'))
+            .catch(err => console.log('Service Worker fel:', err));
+        });
+        }
     </script>
 </body>
 </html>

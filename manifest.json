@@ -1,20 +1,23 @@
 {
-    "name": "Forebollar",
-    "short_name": "Forebollar",
-    "start_url": "index.html",
-    "display": "standalone",
-    "background_color": "#1111",
-    "theme_color": "#1111",
-    "icons": [
-      {
-        "src": "app-logo.png",
-        "sizes": "192x192",
-        "type": "image/png"
-      },
-      {
-        "src": "app-logo.png",
-        "sizes": "512x512",
-        "type": "image/png"
-      }
-    ]
-  }
+  "name": "Forebollar",
+  "short_name": "Forebollar",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#FCFCFB",
+  "theme_color": "#14231C",
+  "description": "Premium Återvunna Golfbollar & Apparel",
+  "icons": [
+    {
+      "src": "logowebb.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "logowebb.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
