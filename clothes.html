@@ -34,13 +34,13 @@
     <nav class="sticky top-0 z-50 bg-[#FCFCFB]/90 backdrop-blur-md border-b border-stone-100 px-4 py-4 md:px-8">
       <div class="grid grid-cols-3 items-center md:hidden">
           <div class="flex items-center space-x-5 text-stone-600">
-              <a href="index.html" class="text-[#14231C]" title="Hem">
+              <a href="index.html" title="Hem">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
               </a>
               <a href="golfbollar.html" title="Bollar">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>
               </a>
-              <a href="clothes.html" title="Kläder">
+              <a href="clothes.html" class="text-[#14231C]" title="Kläder">
                   <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 4L7 6M15 4l2 2M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-14 0l2-2h8l2 2m-12 0h12m-8 4h4" /></svg>
               </a>
           </div>
@@ -65,9 +65,9 @@
       <div class="hidden md:flex justify-between items-center w-full">
           <div class="font-serif text-2xl tracking-[0.3em] font-semibold text-[#14231C] uppercase">Forebollar</div>
           <div class="flex space-x-8 text-xs tracking-widest uppercase font-medium text-stone-600">
-              <a href="index.html" class="text-neutral-900 border-b border-[#14231C]">Hem</a>
+              <a href="index.html" class="hover:text-neutral-900">Hem</a>
               <a href="golfbollar.html" class="hover:text-neutral-900">Golfbollar</a>
-              <a href="clothes.html" class="hover:text-neutral-900">Kläder</a>
+              <a href="clothes.html" class="text-neutral-900 border-b border-[#14231C]">Kläder</a>
               <a href="about.html" class="hover:text-neutral-900">Info</a>
           </div>
           <div class="flex items-center">
@@ -187,8 +187,12 @@
         function updateCartUI() {
             const container = document.getElementById('cart-items');
             const totalEl = document.getElementById('cart-total');
-            document.getElementById('cart-count').innerText = cart.length;
             
+            const countMobile = document.getElementById('cart-count-mobile');
+            const countDesktop = document.getElementById('cart-count-desktop');
+            
+            if(countMobile) countMobile.innerText = cart.length;
+            if(countDesktop) countDesktop.innerText = cart.length;
             if (cart.length === 0) {
                 container.innerHTML = '<p class="text-xs text-stone-400 italic text-center py-12">Varukorgen är tom.</p>';
                 totalEl.innerText = '0.00 kr';
