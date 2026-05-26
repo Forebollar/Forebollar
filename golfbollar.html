@@ -125,50 +125,71 @@
         <p class="text-[10px] text-stone-500 tracking-widest uppercase">© 2024 Forebollar</p>
     </footer>
 
-    <script>
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue, update, set } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    
         emailjs.init("M8hlcCoiJItfe70PT");
-
-        const products = [
-            { name: "Titleist Pro V1/V1x - 12st", price: 200, comparePrice: 599, image: "Golfbollar/Pro-V1.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "Pro V1 är golfbollen som presterar maximalt i alla delar av spelet med ökad längd, låg spinn från tee och penetrerande bollflykt." },
-            { name: "Blandade Märken - 25st", price: 200, comparePrice: 399, image: "Golfbollar/blandade-bollar.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "En lagom mix mellan olika golfbolls märken för dig som letar efter lite högre kvalitet än floridabollar fast till ett bra pris. Omslags bilden för denna mix ger en bra indikation på vad du kan förvänta dig." },
-            { name: "PGA Tour Mix - 25st", price: 360, comparePrice: 700, image: "Golfbollar/pga.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "En perfekt mix av golfbollar som syns på pga touren, detta är en mix för dig som vill ha högsta möjliga prestanda på dina golfbollar. I denna mix inngår: ProV1/V1x, Tp5/Tp5x/Tp5Pix, Chorme Soft/Tour, Bridgestone Tour BXs, Srixon Z-Star." },
-            { name: "Tour Mix - 12st", price: 180, comparePrice: 375, image: "Golfbollar/tour-mix.jpg", stockStatusFirsthand: "Få i lager", stockStatusSecondhand: "Finns i lager", description: "En mix full av prisvärda tourbollar, I mixen kan följande bollar förekomma: Titleist Tour Soft/Speed, Callaway Chrome Soft/Tour, Bridgestone Tour B XS, Srixon Z-Star, Vice Pro, m.m." },
-            { name: "Callaway Chrome Soft - 12st", price: 175, comparePrice: 349, image: "Golfbollar/chromesoft.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "Det är en mjuk och förlåtande tourboll som ger otrolig känsla och fantastisk spinnkontroll i de kortare slagen. Golfbollens hyperelastika SoftFast-kärna bidrar dessutom till låg spinn i utslagen samt exceptionell distans. " },
-            { name: "Taylormade TP5 Mix - 12st", price: 190, comparePrice: 399, image: "Golfbollar/taylormade-tp5.jpg", stockStatusFirsthand: "Slutsåld", stockStatusSecondhand: "Slutsåld", description: "TP5, En 5-delad golfboll designad för att fungera för alla golfare som vill spela på en tourboll av högsta prestanda." },
-            { name: "Taylormade Mix - 12st", price: 135, comparePrice: 279, image: "Golfbollar/taylormade.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "En mycket populär och prisvärd mix av bollar från Taylormade." },
-            { name: "Florida Mix - 25st", price: 180, comparePrice: 279, image: "Golfbollar/florida-mix.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "En perfekt mix av golfbollar för dig som vill köpa prisvärda bollar utan att det spelar så stor roll exakt vilka modeller det är." },
-            { name: "Callaway Mix - 12st", price: 130, comparePrice: 250, image: "Golfbollar/callaway.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "Callaway Mix innehåller en blandning av olika modeller och generationer golfbollar från Callaway som passar alla spelstilar." },
-            { name: "Titleist Mix - 12st", price: 140, comparePrice: 299, image: "Golfbollar/titleist-mix.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "Titleist Mix innehåller en mix av olika modeller och generationer golfbollar som passar alla spelstilar." },
-            { name: "Färg Mix - 12st", price: 150, comparePrice: 350, image: "Golfbollar/färg-mix.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "Färgglada bollar från alla märken, för bättre synlighet på banan." },
-            { name: "Wilson Mix - 12st", price: 110, comparePrice: 160, image: "Golfbollar/wilson-mix.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: "En mix av Wilson golfbollar – bra kvalitet till ett fantastiskt pris, perfekt för spelare som vill ha pålitliga bollar utan att spräcka budgeten! " },
-            { name: "Srixon Mix - 12st", price: 120, comparePrice: 190, image: "Golfbollar/srixon.jpg", stockStatusFirsthand: "Finns i lager", stockStatusSecondhand: "Finns i lager", description: " Här kan du köpa en prisvärd mix av Srixons golfbollar, perfekt för medel och höghandicapare. Mixen innehåller populära modeller som Q-Star, Distance, Hi-Spin och AD333, m.m." },
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYKWVCNLFYMZ9B6QhNXquVG2CyprVtYBc",
+            authDomain: "forebollar-e4ae6.firebaseapp.com",
+            projectId: "forebollar-e4ae6",
+            storageBucket: "forebollar-e4ae6.firebasestorage.app",
+            messagingSenderId: "354593259653",
+            appId: "1:354593259653:web:d80f65293f00de4ff769ec",
+            measurementId: "G-Y629ZF5S4F",
+            databaseURL: "https://forebollar-e4ae6-default-rtdb.europe-west1.firebasedatabase.app"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+    
+        let products = [
+            { id: "pro-v1", name: "Titleist Pro V1/V1x - 12st", price: 200, comparePrice: 599, image: "Golfbollar/Pro-V1.jpg", description: "Pro V1 är golfbollen som presterar maximalt..." },
+            { id: "blandat", name: "Blandade Märken - 25st", price: 200, comparePrice: 399, image: "Golfbollar/blandade-bollar.jpg", description: "En lagom mix..." },
+            { id: "pga-tour", name: "PGA Tour Mix - 25st", price: 360, comparePrice: 700, image: "Golfbollar/pga.jpg", description: "En perfekt mix..." },
+            { id: "tour-mix", name: "Tour Mix - 12st", price: 180, comparePrice: 375, image: "Golfbollar/tour-mix.jpg", description: "En mix full av prisvärda tourbollar..." },
+            { id: "chrome-soft", name: "Callaway Chrome Soft - 12st", price: 175, comparePrice: 349, image: "Golfbollar/chromesoft.jpg", description: "Det är en mjuk och förlåtande tourboll..." },
+            { id: "tp5", name: "Taylormade TP5 Mix - 12st", price: 190, comparePrice: 399, image: "Golfbollar/taylormade-tp5.jpg", description: "TP5, En 5-delad golfboll..." },
+            { id: "taylormade", name: "Taylormade Mix - 12st", price: 135, comparePrice: 279, image: "Golfbollar/taylormade.jpg", description: "En mycket populär mix..." },
+            { id: "florida", name: "Florida Mix - 25st", price: 180, comparePrice: 279, image: "Golfbollar/florida-mix.jpg", description: "En perfekt mix av golfbollar..." },
+            { id: "callaway", name: "Callaway Mix - 12st", price: 130, comparePrice: 250, image: "Golfbollar/callaway.jpg", description: "Innehåller en blandning av modeller..." },
+            { id: "titleist-mix", name: "Titleist Mix - 12st", price: 140, comparePrice: 299, image: "Golfbollar/titleist-mix.jpg", description: "Mix av olika modeller..." },
+            { id: "farg-mix", name: "Färg Mix - 12st", price: 150, comparePrice: 350, image: "Golfbollar/färg-mix.jpg", description: "Färgglada bollar för bättre synlighet..." },
+            { id: "wilson", name: "Wilson Mix - 12st", price: 110, comparePrice: 160, image: "Golfbollar/wilson-mix.jpg", description: "Bra kvalitet till fantastiskt pris..." },
+            { id: "srixon", name: "Srixon Mix - 12st", price: 120, comparePrice: 190, image: "Golfbollar/srixon.jpg", description: "Prisvärd mix, perfekt för medelhandicapare..." }
         ];
-
-        const sales = [
-            { productName: "*", discountPercent: 0, startDate: "2020-09-23", endDate: "2020-06-30", quality: "both" }
-        ];
-
+    
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
-
-        function isSaleActive(sale, productName, quality) {
-            const now = new Date();
-            const start = new Date(sale.startDate);
-            const end = new Date(sale.endDate);
-            if (now < start || now > end) return false;
-            if (sale.productName !== "*" && sale.productName !== productName) return false;
-            if (sale.quality !== "both" && sale.quality !== quality) return false;
-            return true;
+    
+        function startStockListener() {
+            const stockRef = ref(db, 'stocks');
+            onValue(stockRef, (snapshot) => {
+                const data = snapshot.val();
+                
+                if (data) {
+                    products = products.map(p => ({
+                        ...p,
+                        stockFirst: (data[p.id] && data[p.id].first !== undefined) ? data[p.id].first : 0,
+                        stockSecond: (data[p.id] && data[p.id].second !== undefined) ? data[p.id].second : 0
+                    }));
+                    console.log("Lager uppdaterat från Firebase:", data);
+                } else {
+                    console.log("Databasen är tom. Kör setupInitialStock() i konsolen för att ladda upp 10/15.");
+                    
+                    products = products.map(p => ({
+                        ...p,
+                        stockFirst: 0,
+                        stockSecond: 0
+                    }));
+                }
+                renderProducts(); 
+            });
         }
-
-        function getDiscountedPrice(productName, originalPrice, quality) {
-            let activeSale = sales.find(s => isSaleActive(s, productName, quality));
-            if (activeSale) {
-                return originalPrice * (1 - activeSale.discountPercent / 100);
-            }
-            return originalPrice;
-        }
-
-        function renderProducts() {
+    
+        // 4. Rendering & UI
+        window.renderProducts = function() {
             const grid = document.getElementById('product-grid');
             grid.innerHTML = products.map((p, i) => `
                 <div class="group flex flex-col justify-between">
@@ -195,69 +216,136 @@
                     </button>
                 </div>
             `).join('');
-            
             products.forEach((_, i) => updateProductDisplay(i));
-        }
-
-        function updateProductDisplay(index) {
+        };
+    
+        window.updateProductDisplay = function(index) {
             const product = products[index];
             const quality = document.getElementById(`quality-${index}`).value;
             const priceEl = document.getElementById(`price-display-${index}`);
             const stockTag = document.getElementById(`stock-tag-${index}`);
+            const btn = document.querySelector(`button[onclick="addToCart(${index})"]`);
             
-            let basePrice = quality === "firsthand" ? product.price * 1.5 : product.price;
-            let finalPrice = getDiscountedPrice(product.name, basePrice, quality);
-            let stock = quality === "firsthand" ? product.stockStatusFirsthand : product.stockStatusSecondhand;
+            let finalPrice = quality === "firsthand" ? product.price * 1.5 : product.price;
+            let currentStock = quality === "firsthand" ? product.stockFirst : product.stockSecond;
             
-            priceEl.innerText = `${finalPrice.toFixed(2)} kr`;
-            stockTag.innerText = stock;
-            stockTag.style.backgroundColor = (stock === "Finns i lager" || stock === "I lager") ? "#14231C" : "#D97706";
-        }
+            let stockText = "";
+            let bgColor = "";
 
-        function addToCart(index) {
-            const qualitySelect = document.getElementById(`quality-${index}`);
-            const quality = qualitySelect.value;
-            const product = products[index];
+            if (currentStock <= 0 || currentStock === undefined) {
+                stockText = "Slutsåld";
+                bgColor = "#ef4444"; // Röd
+                btn.disabled = true;
+                btn.innerText = "Slutsåld";
+                btn.className = "mt-4 border border-stone-200 text-[9px] md:text-[10px] uppercase tracking-[0.1em] font-bold py-3 opacity-50 cursor-not-allowed";
+            } else if (currentStock === 1) {
+                stockText = "Endast 1 kvar!";
+                bgColor = "#f59e0b"; // Orange
+                btn.disabled = false;
+                btn.innerText = "+ Lägg till";
+                btn.className = "mt-4 border border-stone-200 text-[9px] md:text-[10px] uppercase tracking-[0.1em] font-bold py-3 hover:bg-[#14231C] hover:text-[#E5D3B3] transition duration-300";
+            } else {
+                stockText = "Finns i lager";
+                bgColor = "#14231C"; // Grön/Mörk
+                btn.disabled = false;
+                btn.innerText = "+ Lägg till";
+                btn.className = "mt-4 border border-stone-200 text-[9px] md:text-[10px] uppercase tracking-[0.1em] font-bold py-3 hover:bg-[#14231C] hover:text-[#E5D3B3] transition duration-300";
+            }
             
-            let basePrice = quality === "firsthand" ? product.price * 1.5 : product.price;
-            let finalPrice = getDiscountedPrice(product.name, basePrice, quality);
+            priceEl.innerText = `${finalPrice.toFixed(0)} kr`;
+            stockTag.innerText = stockText;
+            stockTag.style.backgroundColor = bgColor;
+        };
+
+        window.addToCart = function(index) {
+            const quality = document.getElementById(`quality-${index}`).value;
+            const product = products[index];
+            const isFirst = quality === "firsthand";
+            
+            const currentAvailable = isFirst ? product.stockFirst : product.stockSecond;
+            
+            const inCartCount = cart.filter(item => 
+                item.id === product.id && item.quality === (isFirst ? "1:a Klass" : "2:a Klass")
+            ).length;
+
+            if (inCartCount >= currentAvailable) {
+                showToast(`Tyvärr, vi har bara ${currentAvailable}st i lager.`);
+                return;
+            }
+
+            const finalPrice = isFirst ? product.price * 1.5 : product.price;
             
             cart.push({
                 ...product,
-                price: finalPrice.toFixed(2),
-                quality: quality === "firsthand" ? "1:a Klass" : "2:a Klass",
-                category: "golfballs"
+                price: finalPrice.toFixed(0),
+                quality: isFirst ? "1:a Klass" : "2:a Klass"
             });
             
             saveCart();
             updateCartUI();
             showToast(`${product.name} tillagd`);
-        }
-
-        function updateCartUI() {
+        };
+    
+        window.submitOrder = function(e) {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const phone = document.getElementById('phone').value;
+            
+            let orderLines = cart.map(item => `• ${item.name} (${item.quality}) - ${item.price} kr`).join('\n');
+            let total = cart.reduce((sum, item) => sum + parseFloat(item.price), 0);
+    
+            emailjs.send("service_hopnllq", "template_9k0lu8p", {
+                customer_email: email,
+                phone: phone,
+                order: `Ny beställning:\n${orderLines}\n\nTotal: ${total} kr`
+            }).then(() => {
+                const updates = {};
+                cart.forEach(item => {
+                    const p = products.find(prod => prod.name === item.name);
+                    if (p) {
+                        const isFirst = item.quality === "1:a Klass";
+                        const currentStock = isFirst ? p.stockFirst : p.stockSecond;
+                        updates[`stocks/${p.id}/${isFirst ? 'first' : 'second'}`] = Math.max(0, currentStock - 1);
+                    }
+                });
+    
+                update(ref(db), updates).then(() => {
+                    showToast("Tack för din beställning!");
+                    cart = []; 
+                    saveCart(); 
+                    updateCartUI(); 
+                    closeOrderModal(); 
+                    toggleCart(false);
+                });
+            });
+        };
+    
+        // Hjälpfunktioner
+        window.saveCart = () => localStorage.setItem("cart", JSON.stringify(cart));
+        window.updateCartUI = () => {
+            const countMobile = document.getElementById('cart-count-mobile');
+            const countDesktop = document.getElementById('cart-count-desktop');
+            if(countMobile) countMobile.innerText = cart.length;
+            if(countDesktop) countDesktop.innerText = cart.length;
+            
             const container = document.getElementById('cart-items');
             const totalEl = document.getElementById('cart-total');
             
-            const countMobile = document.getElementById('cart-count-mobile');
-            const countDesktop = document.getElementById('cart-count-desktop');
-            
-            if(countMobile) countMobile.innerText = cart.length;
-            if(countDesktop) countDesktop.innerText = cart.length;
             if (cart.length === 0) {
                 container.innerHTML = '<p class="text-xs text-stone-400 italic text-center py-12">Varukorgen är tom.</p>';
-                totalEl.innerText = '0.00 kr';
+                totalEl.innerText = '0 kr';
                 return;
             }
-
+    
             let total = 0;
             container.innerHTML = cart.map((item, i) => {
                 total += parseFloat(item.price);
                 return `
                     <div class="flex justify-between items-center border-b border-stone-50 pb-4">
                         <div class="flex items-center space-x-4">
-                            <div class="w-12 h-12 bg-stone-100"><img src="${item.image}" class="w-full h-full object-cover"></div>
+                            <img src="${item.image}" class="w-12 h-12 object-cover bg-stone-100">
                             <div>
-                                <h4 class="text-[11px] font-bold text-stone-800 uppercase">${item.name}</h4>
+                                <h4 class="text-[10px] font-bold text-stone-800 uppercase">${item.name}</h4>
                                 <p class="text-[9px] text-stone-400 uppercase tracking-widest">${item.quality}</p>
                             </div>
                         </div>
@@ -268,61 +356,42 @@
                     </div>
                 `;
             }).join('');
-            totalEl.innerText = `${total.toFixed(2)} kr`;
-        }
-
-        function removeFromCart(i) { cart.splice(i, 1); saveCart(); updateCartUI(); }
-        function saveCart() { localStorage.setItem("cart", JSON.stringify(cart)); }
-        function toggleCart(force = null) {
+            totalEl.innerText = `${total} kr`;
+        };
+    
+        window.removeFromCart = (i) => { cart.splice(i, 1); saveCart(); updateCartUI(); };
+        window.toggleCart = (force = null) => {
             const sb = document.getElementById('cart-sidebar');
             const bd = document.getElementById('cart-backdrop');
             const open = force !== null ? force : sb.classList.contains('hidden');
             if (open) { sb.classList.remove('hidden'); bd.classList.remove('hidden'); setTimeout(() => sb.classList.remove('translate-x-full'), 10); }
             else { sb.classList.add('translate-x-full'); setTimeout(() => { sb.classList.add('hidden'); bd.classList.add('hidden'); }, 300); }
-        }
-
-        function openOrderModal() {
+        };
+    
+        window.openOrderModal = () => {
             if (cart.length === 0) return;
             const summary = document.getElementById('orderSummary');
-            let total = 0;
-            summary.innerHTML = cart.map(item => {
-                total += parseFloat(item.price);
-                return `<div class="flex justify-between"><span>${item.name} (${item.quality})</span><span>${item.price} kr</span></div>`;
-            }).join('') + `<div class="border-t border-stone-200 mt-2 pt-2 font-bold flex justify-between"><span>Totalt</span><span>${total.toFixed(2)} kr</span></div>`;
+            let total = cart.reduce((s, i) => s + parseFloat(i.price), 0);
+            summary.innerHTML = cart.map(item => `<div class="flex justify-between"><span>${item.name}</span><span>${item.price} kr</span></div>`).join('') + `<div class="border-t mt-2 pt-2 font-bold flex justify-between"><span>Totalt</span><span>${total} kr</span></div>`;
             document.getElementById('orderModal').style.display = 'flex';
-        }
-
-        function closeOrderModal() { document.getElementById('orderModal').style.display = 'none'; }
-
-        function submitOrder(e) {
-            e.preventDefault();
-            const email = document.getElementById('email').value;
-            const phone = document.getElementById('phone').value;
-            let totalPrice = 0;
-            let orderLines = cart.map(item => {
-                totalPrice += parseFloat(item.price);
-                return `• ${item.name} (${item.quality}) - ${item.price} kr`;
-            }).join("\n");
-
-            const orderDetails = `Ny beställning:\n${orderLines}\nTotal: ${totalPrice.toFixed(2)} kr\nE-post: ${email}\nTfn: ${phone}`;
-
-            emailjs.send("service_hopnllq", "template_9k0lu8p", { customer_email: email, phone: phone, order: orderDetails })
-                .then(() => {
-                    showToast("Beställning skickad!");
-                    cart = []; saveCart(); updateCartUI(); closeOrderModal(); toggleCart(false);
-                })
-                .catch(err => showToast("Fel vid skickning: " + err));
-        }
-
-        function showToast(msg) {
-            const t = document.createElement('div');
-            t.className = 'toast'; t.innerText = msg;
-            document.body.appendChild(t);
-            setTimeout(() => t.classList.add('show'), 100);
+        };
+    
+        window.closeOrderModal = () => document.getElementById('orderModal').style.display = 'none';
+    
+        window.showToast = (msg) => {
+            const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg;
+            document.body.appendChild(t); setTimeout(() => t.classList.add('show'), 100);
             setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 500); }, 3000);
-        }
-
-        window.onload = () => { renderProducts(); updateCartUI(); };
+        };
+    
+        // Initiera
+        window.setupInitialStock = () => {
+            const initial = {};
+            products.forEach(p => initial[p.id] = { first: 10, second: 15 });
+            set(ref(db, 'stocks'), initial).then(() => alert("Klar!"));
+        };
+    
+        window.onload = () => { startStockListener(); updateCartUI(); };
     </script>
 </body>
 </html>

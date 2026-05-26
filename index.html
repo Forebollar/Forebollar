@@ -97,13 +97,13 @@
         </div>
     </header>
 
-    <section class="py-20 px-4 md:px-12 max-w-7xl mx-auto overflow-hidden">
-        <div class="flex justify-between items-end mb-12">
+    <section class="py-12 md:py-20 max-w-7xl mx-auto overflow-hidden">
+        <div class="px-4 md:px-12 flex justify-between items-end mb-8 md:mb-12">
             <div>
                 <p class="text-[10px] text-stone-400 uppercase tracking-[0.3em] mb-2">Utvalda Produkter</p>
                 <h2 class="font-serif text-3xl md:text-4xl text-[#14231C]">Mest Populära</h2>
             </div>
-            <div class="flex space-x-4 mb-1">
+            <div class="hidden md:flex space-x-4 mb-1">
                 <button id="prev" class="p-2 border border-stone-200 rounded-full hover:bg-stone-100 transition">
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/></svg>
                 </button>
@@ -112,9 +112,9 @@
                 </button>
             </div>
         </div>
-
-        <div class="slider-container">
-            <div id="slider-track" class="product-slider">
+    
+        <div class="relative">
+            <div id="slider-track" class="flex gap-4 md:gap-6 overflow-x-auto md:overflow-x-visible no-scrollbar snap-x snap-mandatory px-4 md:px-12 transition-transform duration-500 ease-in-out">
                 </div>
         </div>
     </section>
@@ -177,11 +177,10 @@
         function renderSlider() {
             const track = document.getElementById('slider-track');
             track.innerHTML = products.map((p, i) => `
-                <div class="min-w-[280px] md:min-w-[320px] group">
+                <div class="min-w-[75%] md:min-w-[320px] snap-center group">
                     <a href="${p.link}">
-                        <div class="relative aspect-[3/4] bg-[#F9F9F8] overflow-hidden mb-4">
+                        <div class="relative aspect-[3/4] bg-[#F9F9F8] overflow-hidden mb-4 rounded-sm">
                             <img src="${p.image}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
-                            <div class="absolute inset-0 bg-black/0 group-hover:bg-black/5 transition duration-500"></div>
                         </div>
                         <p class="text-[10px] text-stone-400 uppercase tracking-widest mb-1">Visa Produkt</p>
                         <h3 class="font-medium text-sm text-[#14231C] tracking-wide uppercase">${p.name}</h3>
@@ -193,9 +192,27 @@
 
         function updateSlider() {
             const track = document.getElementById('slider-track');
-            const cardWidth = track.children[0].offsetWidth + 24; // Width + gap
-            track.style.transform = `translateX(${-currentIndex * cardWidth}px)`;
+            if (window.innerWidth >= 768) {
+                const cardWidth = track.children[0].offsetWidth + 24; 
+                track.style.transform = `translateX(${-currentIndex * cardWidth}px)`;
+            } else {
+                track.style.transform = `none`;
+            }
         }
+
+        document.getElementById('next').addEventListener('click', () => {
+            if (currentIndex < products.length - 1) {
+                currentIndex++;
+                updateSlider();
+            }
+        });
+
+        document.getElementById('prev').addEventListener('click', () => {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateSlider();
+            }
+        });
 
         document.getElementById('next').addEventListener('click', () => {
             if (currentIndex < products.length - 1) {
