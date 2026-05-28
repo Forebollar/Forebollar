@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="sv" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Produkt | FOREBOLLAR</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,600;1,400&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #FCFCFB; }
+        .font-serif { font-family: 'Cormorant Garamond', serif; }
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; background: #14231C; color: white;
+            padding: 15px 25px; border-radius: 4px; box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            opacity: 0; transform: translateY(20px); transition: all 0.4s ease; z-index: 100;
+            font-size: 14px; letter-spacing: 0.05em;
+        }
+        .toast.show { opacity: 1; transform: translateY(0); }
+        
+        .fade-in { animation: fadeIn 0.8s ease forwards; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body class="text-neutral-800">
+
+    <nav class="fixed w-full z-50 bg-[#FCFCFB]/90 backdrop-blur-sm border-b border-stone-100">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex justify-between items-center">
+            <a href="golfbollar.html" class="flex items-center space-x-2 group">
+                <svg class="w-4 h-4 transform group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7"/></svg>
+                <span class="text-[10px] uppercase tracking-[0.3em] font-semibold">Tillbaka</span>
+            </a>
+            <div class="absolute left-1/2 -translate-x-1/2">
+                <h1 class="text-xl tracking-[0.4em] font-light italic font-serif uppercase">Forebollar</h1>
+            </div>
+            <div class="flex items-center">
+                <button class="text-stone-700 relative" onclick="toggleCart()">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+                    <span id="cart-count-desktop" class="absolute -top-1 -right-2 bg-[#14231C] text-[#E5D3B3] text-[9px] w-4 h-4 rounded-full flex items-center justify-center font-bold">0</span>
+                </button>
+            </div>
+        </div>
+    </nav>
+
+    <main class="pt-32 pb-20 px-6 max-w-7xl mx-auto">
+        <div id="product-container" class="grid grid-cols-1 md:grid-cols-2 gap-16 items-start fade-in mb-24">
+            <div class="bg-[#F9F9F8] aspect-square overflow-hidden border border-stone-50">
+                <img id="p-image" src="" alt="Produktbild" class="w-full h-full object-cover">
+            </div>
+
+            <div class="flex flex-col space-y-10">
+                <div>
+                    <p id="p-category" class="text-[10px] uppercase tracking-[0.3em] text-stone-400 mb-2 font-medium uppercase">Premium</p>
+                    <h1 id="p-name" class="font-serif text-4xl md:text-6xl text-[#14231C] leading-tight mb-4 text-balance uppercase tracking-tight"></h1>
+                    <div class="flex items-center space-x-4">
+                        <span id="p-price" class="font-serif text-3xl italic text-[#14231C]"></span>
+                        <span id="p-compare" class="text-stone-400 line-through text-sm"></span>
+                    </div>
+                </div>
+
+                <div class="space-y-4">
+                    <p class="text-[10px] uppercase tracking-[0.2em] font-bold text-stone-500 border-b border-stone-100 pb-2">Beskrivning</p>
+                    <p id="p-desc" class="text-stone-600 leading-relaxed font-light text-sm md:text-base"></p>
+                </div>
+
+                <div class="pt-6 space-y-6">
+                    <div class="flex flex-col space-y-2">
+                        <label class="text-[9px] uppercase tracking-[0.2em] font-bold text-stone-400">Välj Skick</label>
+                        <select id="p-quality" class="bg-transparent border border-stone-200 py-3 px-4 text-[10px] uppercase tracking-widest focus:outline-none focus:border-[#14231C] cursor-pointer rounded-none" onchange="updateLocalDisplay()">
+                            <option value="secondhand">2:a Klass (Andrasortering)</option>
+                            <option value="firsthand">1:a Klass (Förstasortering)</option>
+                        </select>
+                    </div>
+
+                    <button onclick="handleAddToCart()" class="bg-[#14231C] text-[#E5D3B3] w-full py-5 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-[#1f332a] transition-colors duration-500 shadow-xl shadow-stone-200/50">
+                        Lägg i varukorg
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="border-t border-stone-100 pt-20 fade-in" style="animation-delay: 0.2s;">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-16 items-center">
+                <div class="flex justify-center md:justify-end">
+                    <div class="relative w-64 h-64 md:w-80 md:h-80">
+                        <div class="absolute inset-0 border border-stone-100 rounded-full scale-110"></div>
+                        <img src="sortering.png" alt="Gradering" class="w-full h-full object-cover rounded-full shadow-2xl transition-all duration-700">
+                        <div class="absolute -bottom-4 -left-4 bg-[#14231C] text-[#E5D3B3] p-6 rounded-full w-20 h-20 flex items-center justify-center text-center">
+                            <span class="text-[8px] uppercase tracking-tighter font-bold">Premium Quality</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="space-y-8">
+                    <div class="space-y-2">
+                        <p class="text-[10px] uppercase tracking-[0.4em] text-stone-400 font-bold">Kvalitetsguide</p>
+                        <h2 class="font-serif text-4xl text-[#14231C]">Vår Gradering</h2>
+                    </div>
+                    
+                    <div class="space-y-8">
+                        <div class="group">
+                            <h4 class="text-[11px] uppercase tracking-[0.2em] font-bold text-stone-800 mb-2 flex items-center">
+                                <span class="w-8 h-[1px] bg-[#14231C] mr-3"></span>
+                                Förstasortering (1:a Klass)
+                            </h4>
+                            <p class="text-sm text-stone-500 leading-relaxed font-light pl-11">
+                                Skalets glans är fortfarande i topp. Reklamlogga och/eller markeringar av tuschpenna kan förekomma. Det perfekta valet för dig som vill ha bollar i nyskick till ett bättre pris.
+                            </p>
+                        </div>
+
+                        <div class="group">
+                            <h4 class="text-[11px] uppercase tracking-[0.2em] font-bold text-stone-800 mb-2 flex items-center">
+                                <span class="w-8 h-[1px] bg-stone-300 mr-3"></span>
+                                Andrasortering (2:a Klass)
+                            </h4>
+                            <p class="text-sm text-stone-500 leading-relaxed font-light pl-11">
+                                Mycket prisvärda golfbollar! Skrapmärken, nyansskillnader och tuschmarkeringar är vanliga. Prestandan är fortfarande hög, men det syns att bollarna har spelats tidigare.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <div id="cart-sidebar" class="fixed inset-y-0 right-0 w-full sm:w-[450px] bg-[#FCFCFB] z-[60] shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out hidden flex-col text-neutral-900">
+        <div class="p-6 flex justify-between items-center border-b border-stone-100">
+            <h2 class="font-serif text-xl tracking-wide font-semibold">Din Varukorg</h2>
+            <button onclick="toggleCart()" class="text-stone-500 text-2xl">&times;</button>
+        </div>
+        <div id="cart-items" class="flex-grow overflow-y-auto p-6 space-y-6 no-scrollbar"></div>
+        <div class="p-6 border-t border-stone-100 bg-white">
+            <div class="flex justify-between text-sm mb-4">
+                <span class="text-stone-500 tracking-widest uppercase text-[10px]">Totalt</span>
+                <span id="cart-total" class="font-medium text-[#14231C]">0 kr</span>
+            </div>
+            <a href="golfbollar.html?openCart=true" class="block w-full bg-[#14231C] text-[#E5D3B3] py-4 text-center text-xs tracking-widest uppercase font-semibold">Gå till kassan</a>
+        </div>
+    </div>
+    <div id="cart-backdrop" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[55] hidden" onclick="toggleCart()"></div>
+
+    <script type="module">
+        // Samma produkt-lista och logik som tidigare
+        const products = [
+            { id: "pro-v1", name: "Titleist Pro V1/V1x - 12st", price: 200, comparePrice: 599, image: "Golfbollar/Pro-V1.jpg", description: "Pro V1 är golfbollen som presterar maximalt för alla golfare. Den ger exceptionell distans och konsekvent bollflykt." },
+            { id: "blandat", name: "Blandade Märken - 25st", price: 200, comparePrice: 399, image: "Golfbollar/blandade-bollar.jpg", description: "En lagom mix av bollar för dig som vill ha mycket boll för pengarna. Denna mix kan innehålla följande märken: Titliest, Callaway, Srixon, Taylormade m.m." },
+            { id: "pga-tour", name: "PGA Tour Mix - 25st", price: 360, comparePrice: 700, image: "Golfbollar/pga.jpg", description: "En perfekt mix av de bollar som används mest på touren. I denna mix kan en blandning av dessa golfbollar förekomma: Pro V1, TP5, Chrome Soft, Z-Star, TourBxS m.m." },
+            { id: "tour-mix", name: "Tour Mix - 12st", price: 180, comparePrice: 375, image: "Golfbollar/tour-mix.jpg", description: "En mix full av prisvärda tourbollar från olika märken. Denna mix innehåller en blanding utav följande golfbollar: Z-Star, Tour Soft, Tour Speed, Chrome Tour m.m." },
+            { id: "chrome-soft", name: "Callaway Chrome Soft - 12st", price: 175, comparePrice: 349, image: "Golfbollar/chromesoft.jpg", description: "En mjuk och förlåtande tourboll med fantastisk kontroll." },
+            { id: "tp5", name: "Taylormade TP5 Mix - 12st", price: 190, comparePrice: 399, image: "Golfbollar/taylormade-tp5.jpg", description: "TP5 är en 5-delad golfboll som levererar prestanda i världsklass." },
+            { id: "taylormade", name: "Taylormade Mix - 12st", price: 135, comparePrice: 279, image: "Golfbollar/taylormade.jpg", description: "En mycket populär mix av Taylormades mest sålda modeller." },
+            { id: "florida", name: "Florida Mix - 25st", price: 180, comparePrice: 279, image: "Golfbollar/florida-mix.jpg", description: "En perfekt mix av bollar som passar alla typer av spelare." },
+            { id: "callaway", name: "Callaway Mix - 12st", price: 130, comparePrice: 250, image: "Golfbollar/callaway.jpg", description: "Innehåller en blandning av Callaways mest pålitliga modeller." },
+            { id: "titleist-mix", name: "Titleist Mix - 12st", price: 140, comparePrice: 299, image: "Golfbollar/titleist-mix.jpg", description: "Mix av olika modeller från Titleist förutom Pro V1-serien." },
+            { id: "farg-mix", name: "Färg Mix - 12st", price: 150, comparePrice: 350, image: "Golfbollar/färg-mix.jpg", description: "Färgglada bollar som ger bättre synlighet på banan." },
+            { id: "wilson", name: "Wilson Mix - 12st", price: 110, comparePrice: 160, image: "Golfbollar/wilson-mix.jpg", description: "Wilson Mix med bra kvalitet och känsla till ett fantastiskt pris." },
+            { id: "srixon", name: "Srixon Mix - 12st", price: 120, comparePrice: 190, image: "Golfbollar/srixon.jpg", description: "Prisvärd mix av srixon golfbollar." }
+        ];
+
+        let cart = JSON.parse(localStorage.getItem("cart")) || [];
+        const params = new URLSearchParams(window.location.search);
+        const product = products.find(p => p.id === params.get('id'));
+
+        if (!product) window.location.href = 'golfbollar.html';
+
+        window.initProduct = function() {
+            document.getElementById('p-name').innerText = product.name;
+            document.getElementById('p-image').src = product.image;
+            document.getElementById('p-desc').innerText = product.description;
+            updateLocalDisplay();
+            updateCartUI();
+        }
+
+        window.updateLocalDisplay = function() {
+            const quality = document.getElementById('p-quality').value;
+            const priceEl = document.getElementById('p-price');
+            const compareEl = document.getElementById('p-compare');
+            let price = quality === 'firsthand' ? product.price * 1.5 : product.price;
+            priceEl.innerText = `${Math.round(price)} kr`;
+            compareEl.innerText = `${product.comparePrice} kr`;
+        }
+
+        window.handleAddToCart = function() {
+            const quality = document.getElementById('p-quality').value;
+            const isFirst = quality === "firsthand";
+            const finalPrice = isFirst ? product.price * 1.5 : product.price;
+            cart.push({...product, price: Math.round(finalPrice), quality: isFirst ? "1:a Klass" : "2:a Klass"});
+            localStorage.setItem("cart", JSON.stringify(cart));
+            updateCartUI();
+            showToast(`${product.name} tillagd`);
+            toggleCart(true);
+        }
+
+        window.updateCartUI = () => {
+            const count = document.getElementById('cart-count-desktop');
+            if(count) count.innerText = cart.length;
+            const container = document.getElementById('cart-items');
+            const totalEl = document.getElementById('cart-total');
+            if (cart.length === 0) {
+                container.innerHTML = '<p class="text-xs text-stone-400 italic text-center py-12">Varukorgen är tom.</p>';
+                totalEl.innerText = '0 kr';
+                return;
+            }
+            let total = 0;
+            container.innerHTML = cart.map((item, i) => {
+                total += parseFloat(item.price);
+                return `
+                    <div class="flex justify-between items-center border-b border-stone-50 pb-4">
+                        <div class="flex items-center space-x-4">
+                            <img src="${item.image}" class="w-12 h-12 object-cover bg-stone-100">
+                            <div>
+                                <h4 class="text-[10px] font-bold text-stone-800 uppercase">${item.name}</h4>
+                                <p class="text-[9px] text-stone-400 uppercase tracking-widest">${item.quality}</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <p class="font-serif italic text-sm text-[#14231C]">${item.price} kr</p>
+                            <button onclick="removeFromCart(${i})" class="text-[8px] text-red-800 uppercase font-bold">Ta bort</button>
+                        </div>
+                    </div>`;
+            }).join('');
+            totalEl.innerText = `${total} kr`;
+        };
+
+        window.removeFromCart = (i) => { cart.splice(i, 1); localStorage.setItem("cart", JSON.stringify(cart)); updateCartUI(); };
+        window.toggleCart = (force = null) => {
+            const sb = document.getElementById('cart-sidebar');
+            const bd = document.getElementById('cart-backdrop');
+            const open = force !== null ? force : sb.classList.contains('hidden');
+            if (open) { sb.classList.remove('hidden'); bd.classList.remove('hidden'); setTimeout(() => sb.classList.remove('translate-x-full'), 10); }
+            else { sb.classList.add('translate-x-full'); setTimeout(() => { sb.classList.add('hidden'); bd.classList.add('hidden'); }, 300); }
+        };
+
+        window.showToast = (msg) => {
+            const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg;
+            document.body.appendChild(t); setTimeout(() => t.classList.add('show'), 100);
+            setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 500); }, 3000);
+        };
+
+        initProduct();
+    </script>
+</body>
+</html>

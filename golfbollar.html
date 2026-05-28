@@ -251,7 +251,7 @@
             const grid = document.getElementById('product-grid');
             grid.innerHTML = products.map((p, i) => `
                 <div class="group flex flex-col justify-between">
-                    <div>
+                    <a href="produkt.html?id=${p.id}" class="block">
                         <div class="relative bg-[#F9F9F8] aspect-square overflow-hidden mb-3">
                             <img src="${p.image}" alt="${p.name}" class="w-full h-full object-cover transition duration-500 group-hover:scale-105">
                             <div id="stock-tag-${i}" class="absolute top-2 left-2 text-[8px] tracking-widest uppercase px-2 py-1 z-10 text-white font-bold"></div>
@@ -260,14 +260,14 @@
                             <p class="text-[9px] text-stone-400 uppercase tracking-widest">Premium</p>
                             <span class="text-[9px] font-serif italic text-stone-400 line-through">${p.comparePrice} kr</span>
                         </div>
-                        <h3 class="font-medium text-xs md:text-sm text-neutral-800 tracking-wide px-1 h-9 overflow-hidden">${p.name}</h3>
-                        <div class="mt-2 flex items-center justify-between px-1">
-                            <p id="price-display-${i}" class="font-serif italic text-sm md:text-base text-[#14231C]"></p>
-                            <select id="quality-${i}" onchange="updateProductDisplay(${i})" class="text-[9px] md:text-[10px] uppercase tracking-tighter border-none bg-transparent focus:outline-none cursor-pointer text-stone-500 font-bold">
-                                <option value="secondhand">2:a Klass</option>
-                                <option value="firsthand">1:a Klass</option>
-                            </select>
-                        </div>
+                        <h3 class="font-medium text-xs md:text-sm text-neutral-800 tracking-wide px-1 h-9 overflow-hidden hover:text-stone-500 transition-colors">${p.name}</h3>
+                    </a>
+                    <div class="mt-2 flex items-center justify-between px-1">
+                        <p id="price-display-${i}" class="font-serif italic text-sm md:text-base text-[#14231C]"></p>
+                        <select id="quality-${i}" onchange="updateProductDisplay(${i})" class="text-[9px] md:text-[10px] uppercase tracking-tighter border-none bg-transparent focus:outline-none cursor-pointer text-stone-500 font-bold">
+                            <option value="secondhand">2:a Klass</option>
+                            <option value="firsthand">1:a Klass</option>
+                        </select>
                     </div>
                     <button onclick="addToCart(${i})" class="mt-4 border border-stone-200 text-[9px] md:text-[10px] uppercase tracking-[0.1em] font-bold py-3 hover:bg-[#14231C] hover:text-[#E5D3B3] transition duration-300">
                         + Lägg till
