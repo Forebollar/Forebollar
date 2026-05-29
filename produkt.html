@@ -60,7 +60,7 @@
             <div class="bg-[#F9F9F8] aspect-square overflow-hidden border border-stone-50">
                 <img id="p-image" src="" alt="Produktbild" class="w-full h-full object-cover">
             </div>
-
+            
             <div class="flex flex-col space-y-10">
                 <div>
                     <p id="p-category" class="text-[10px] uppercase tracking-[0.3em] text-stone-400 mb-2 font-medium uppercase">Premium</p>
@@ -77,12 +77,14 @@
                 </div>
 
                 <div class="pt-6 space-y-6">
-                    <div class="flex flex-col space-y-2">
-                        <label class="text-[9px] uppercase tracking-[0.2em] font-bold text-stone-400">Välj Skick</label>
-                        <select id="p-quality" class="bg-transparent border border-stone-200 py-3 px-4 text-[10px] uppercase tracking-widest focus:outline-none focus:border-[#14231C] cursor-pointer rounded-none" onchange="updateLocalDisplay()">
-                            <option value="secondhand">2:a Klass (Andrasortering)</option>
+                    <div class="space-y-4">
+                        <label class="text-[10px] uppercase tracking-widest text-stone-400 font-bold">Välj Kvalitet</label>
+                        <select id="p-quality" onchange="updateLocalDisplay()" class="w-full border-b border-stone-200 py-3 text-xs focus:outline-none focus:border-[#14231C] bg-transparent">
                             <option value="firsthand">1:a Klass (Förstasortering)</option>
+                            <option value="secondhand">2:a Klass (Andrasortering)</option>
                         </select>
+                        
+                        <p id="stock-status" class="text-[10px] uppercase tracking-[0.1em] text-stone-500 italic"></p>
                     </div>
 
                     <button onclick="handleAddToCart()" class="bg-[#14231C] text-[#E5D3B3] w-full py-5 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-[#1f332a] transition-colors duration-500 shadow-xl shadow-stone-200/50">
@@ -149,7 +151,23 @@
     <div id="cart-backdrop" class="fixed inset-0 bg-black/30 backdrop-blur-sm z-[55] hidden" onclick="toggleCart()"></div>
 
     <script type="module">
-        // Samma produkt-lista och logik som tidigare
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+        import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-database.js";
+    
+        const firebaseConfig = {
+            apiKey: "AIzaSyAYKWVCNLFYMZ9B6QhNXquVG2CyprVtYBc",
+            authDomain: "forebollar-e4ae6.firebaseapp.com",
+            projectId: "forebollar-e4ae6",
+            storageBucket: "forebollar-e4ae6.firebasestorage.app",
+            messagingSenderId: "354593259653",
+            appId: "1:354593259653:web:d80f65293f00de4ff769ec",
+            measurementId: "G-Y629ZF5S4F",
+            databaseURL: "https://forebollar-e4ae6-default-rtdb.europe-west1.firebasedatabase.app"
+        };
+    
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+    
         const products = [
             { id: "pro-v1", name: "Titleist Pro V1/V1x - 12st", price: 200, comparePrice: 599, image: "Golfbollar/Pro-V1.jpg", description: "Pro V1 är golfbollen som presterar maximalt för alla golfare. Den ger exceptionell distans och konsekvent bollflykt." },
             { id: "blandat", name: "Blandade Märken - 25st", price: 200, comparePrice: 399, image: "Golfbollar/blandade-bollar.jpg", description: "En lagom mix av bollar för dig som vill ha mycket boll för pengarna. Denna mix kan innehålla följande märken: Titliest, Callaway, Srixon, Taylormade m.m." },
@@ -165,41 +183,86 @@
             { id: "wilson", name: "Wilson Mix - 12st", price: 110, comparePrice: 160, image: "Golfbollar/wilson-mix.jpg", description: "Wilson Mix med bra kvalitet och känsla till ett fantastiskt pris." },
             { id: "srixon", name: "Srixon Mix - 12st", price: 120, comparePrice: 190, image: "Golfbollar/srixon.jpg", description: "Prisvärd mix av srixon golfbollar." }
         ];
-
+    
         let cart = JSON.parse(localStorage.getItem("cart")) || [];
         const params = new URLSearchParams(window.location.search);
-        const product = products.find(p => p.id === params.get('id'));
-
+        let product = products.find(p => p.id === params.get('id'));
+    
         if (!product) window.location.href = 'golfbollar.html';
-
-        window.initProduct = function() {
-            document.getElementById('p-name').innerText = product.name;
-            document.getElementById('p-image').src = product.image;
-            document.getElementById('p-desc').innerText = product.description;
-            updateLocalDisplay();
-            updateCartUI();
+    
+        // Lager-variabler
+        let stockFirst = 0;
+        let stockSecond = 0;
+    
+        // Lyssna på lagerstatus för just denna produkt
+        function startStockListener() {
+            const stockRef = ref(db, `stocks/${product.id}`);
+            onValue(stockRef, (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    stockFirst = data.first || 0;
+                    stockSecond = data.second || 0;
+                    updateLocalDisplay();
+                }
+            });
         }
-
+    
         window.updateLocalDisplay = function() {
             const quality = document.getElementById('p-quality').value;
             const priceEl = document.getElementById('p-price');
             const compareEl = document.getElementById('p-compare');
+            const stockStatusEl = document.getElementById('stock-status');
+            const btn = document.querySelector('button[onclick="handleAddToCart()"]');
+            
             let price = quality === 'firsthand' ? product.price * 1.5 : product.price;
+            let currentStock = quality === 'firsthand' ? stockFirst : stockSecond;
+
             priceEl.innerText = `${Math.round(price)} kr`;
             compareEl.innerText = `${product.comparePrice} kr`;
-        }
 
+            if (currentStock <= 0) {
+                stockStatusEl.innerText = "Slutsåld";
+                stockStatusEl.classList.add('text-red-800');
+                stockStatusEl.classList.remove('text-stone-500');
+                
+                btn.disabled = true;
+                btn.innerText = "Slutsåld";
+                btn.className = "bg-stone-300 text-stone-500 w-full py-5 text-[10px] uppercase tracking-[0.3em] font-bold cursor-not-allowed";
+            } else {
+                stockStatusEl.innerText = `${currentStock} st kvar i lager`;
+                stockStatusEl.classList.remove('text-red-800');
+                stockStatusEl.classList.add('text-stone-500');
+
+                btn.disabled = false;
+                btn.innerText = "Lägg i varukorg";
+                btn.className = "bg-[#14231C] text-[#E5D3B3] w-full py-5 text-[10px] uppercase tracking-[0.3em] font-bold hover:bg-[#1f332a] transition-colors duration-500 shadow-xl shadow-stone-200/50";
+            }
+        }
+    
         window.handleAddToCart = function() {
             const quality = document.getElementById('p-quality').value;
             const isFirst = quality === "firsthand";
+            const currentAvailable = isFirst ? stockFirst : stockSecond;
+            const qualityText = isFirst ? "1:a Klass" : "2:a Klass";
+    
+            const inCartCount = cart.filter(item => 
+                item.id === product.id && item.quality === qualityText
+            ).length;
+    
+            if (inCartCount >= currentAvailable) {
+                showToast(`Tyvärr, vi har bara ${currentAvailable}st i lager.`);
+                return;
+            }
+    
             const finalPrice = isFirst ? product.price * 1.5 : product.price;
-            cart.push({...product, price: Math.round(finalPrice), quality: isFirst ? "1:a Klass" : "2:a Klass"});
+            cart.push({...product, price: Math.round(finalPrice), quality: qualityText});
             localStorage.setItem("cart", JSON.stringify(cart));
             updateCartUI();
             showToast(`${product.name} tillagd`);
             toggleCart(true);
         }
-
+    
+        // -- Övriga funktioner (identiska med dina tidigare) --
         window.updateCartUI = () => {
             const count = document.getElementById('cart-count-desktop');
             if(count) count.innerText = cart.length;
@@ -230,23 +293,35 @@
             }).join('');
             totalEl.innerText = `${total} kr`;
         };
-
+    
         window.removeFromCart = (i) => { cart.splice(i, 1); localStorage.setItem("cart", JSON.stringify(cart)); updateCartUI(); };
+        
         window.toggleCart = (force = null) => {
             const sb = document.getElementById('cart-sidebar');
             const bd = document.getElementById('cart-backdrop');
             const open = force !== null ? force : sb.classList.contains('hidden');
-            if (open) { sb.classList.remove('hidden'); bd.classList.remove('hidden'); setTimeout(() => sb.classList.remove('translate-x-full'), 10); }
-            else { sb.classList.add('translate-x-full'); setTimeout(() => { sb.classList.add('hidden'); bd.classList.add('hidden'); }, 300); }
+            if (open) { 
+                sb.classList.remove('hidden'); 
+                bd.classList.remove('hidden'); 
+                setTimeout(() => sb.classList.remove('translate-x-full'), 10); 
+            } else { 
+                sb.classList.add('translate-x-full'); 
+                setTimeout(() => { sb.classList.add('hidden'); bd.classList.add('hidden'); }, 300); 
+            }
         };
-
+    
         window.showToast = (msg) => {
             const t = document.createElement('div'); t.className = 'toast'; t.innerText = msg;
             document.body.appendChild(t); setTimeout(() => t.classList.add('show'), 100);
             setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 500); }, 3000);
         };
-
-        initProduct();
+    
+        document.getElementById('p-name').innerText = product.name;
+        document.getElementById('p-image').src = product.image;
+        document.getElementById('p-desc').innerText = product.description;
+        startStockListener();
+        updateCartUI();
+    
     </script>
 </body>
 </html>
